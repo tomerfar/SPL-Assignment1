@@ -57,6 +57,7 @@ Order::Order(int id, int customerId, int distance):
     }
     return "None";
   }
+
   const std::string Order::toString() const{
     string str_collector = std::to_string(driverId);
     if(driverId == NO_VOLUNTEER){
@@ -67,13 +68,17 @@ Order::Order(int id, int customerId, int distance):
         str_driver = "None";
     }
     
-     return "OrderId " + std::to_string(id) + "\n" + 
-     "OrderStatus " + std::to_string(static_cast<int>(status)) + "\n" + 
-     "CustomerID " + std::to_string(customerId) + "\n" + 
-     "Collector " + str_collector + "\n" + 
-     "Driver " + str_driver;
+     return "OrderId: " + std::to_string(id) +
+      "\n" 
+     + "OrderStatus: " + std::to_string(static_cast<int>(status)) + // need to check this line.
+      "\n" 
+     + "CustomerId: " + std::to_string(customerId) +
+      "\n" 
+     + "Collector: " + str_collector + 
+     "\n" 
+     + "Driver: " + str_driver;
   }
 
-1;
+
 
 
