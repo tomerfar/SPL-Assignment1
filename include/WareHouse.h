@@ -4,6 +4,7 @@
 
 #include "Order.h"
 #include "Customer.h"
+#include "Volunteer.h"
 
 class BaseAction;
 class Volunteer;
@@ -25,6 +26,15 @@ class WareHouse {
         void close();
         void open();
 
+        vector<Order*> getPendingOrders();
+        vector<Order*> getInProcessOrders();
+        vector<Order*> getCompletedOrders();
+        vector<Volunteer*> getVolunteers();
+        int getCustomerCounter();
+        int getOrderCounter();
+        int getVolunteerCounter();
+
+
     private:
         bool isOpen;
         vector<BaseAction*> actionsLog;
@@ -35,4 +45,9 @@ class WareHouse {
         vector<Customer*> customers;
         int customerCounter; //For assigning unique customer IDs
         int volunteerCounter; //For assigning unique volunteer IDs
+        int orderCounter; //For assigning unique order IDs
+
+        vector<CollectorVolunteer*> availableCollectors;
+        vector<DriverVolunteer*> availableDrivers;
+
 };

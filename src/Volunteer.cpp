@@ -6,7 +6,8 @@ Volunteer::Volunteer(int id, const string &name) : id(id), name(name), activeOrd
 
  
 //Volunteer Methods
-int Volunteer:: getId() const{
+int Volunteer:: getId() const
+{
     return id;
 }
 
@@ -116,7 +117,7 @@ string CollectorVolunteer:: toString() const
 // #Limited Collector Volunteer#
 //Constructors
 LimitedCollectorVolunteer:: LimitedCollectorVolunteer(int id, const string &name, int coolDown ,int maxOrders)
-: Volunteer(id, name, coolDown, maxOrders){}
+: CollectorVolunteer(id, name, coolDown, maxOrders){}
 
 
 LimitedCollectorVolunteer *LimitedCollectorVolunteer::clone()const
