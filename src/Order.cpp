@@ -8,23 +8,33 @@ Order::Order(int id, int customerId, int distance):
  status(OrderStatus::PENDING), collectorId(NO_VOLUNTEER), driverId(NO_VOLUNTEER) {}
 
  //Methods
- int Order:: getId() const {
+ int Order:: getId() const 
+ {
     return id;
  }
  
- int Order:: getCustomerId() const{
+ int Order:: getCustomerId() const
+ {
     return customerId;
  }
 
- void Order:: setStatus(OrderStatus status){
+ int Order:: getDistance() const
+ {
+  return distance;
+ }
+
+ void Order:: setStatus(OrderStatus status)
+ {
     this->status = status;
  }
 
- void Order:: setCollectorId(int collectorId){
+ void Order:: setCollectorId(int collectorId)
+ {
     this->collectorId = collectorId;
-  }
+ }
 
-  void Order:: setDriverId(int driverId){
+  void Order:: setDriverId(int driverId)
+  {
     this->driverId = driverId;
   }
 
@@ -60,11 +70,12 @@ Order::Order(int id, int customerId, int distance):
 
   const std::string Order::toString() const{
     string str_collector = std::to_string(driverId);
-    if(driverId == NO_VOLUNTEER){
+    if(collectorId == NO_VOLUNTEER)
+    {
         str_collector = "None";
     }
     string str_driver = std::to_string(collectorId);
-    if(collectorId == NO_VOLUNTEER){
+    if(driverId == NO_VOLUNTEER){
         str_driver = "None";
     }
     

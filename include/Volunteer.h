@@ -43,7 +43,7 @@ class CollectorVolunteer: public Volunteer {
         void step() override;
         int getCoolDown() const;
         int getTimeLeft() const;
-        bool decreaseCoolDown();//Decrease timeLeft by 1,return true if timeLeft=0,false otherwise
+        bool decreaseCoolDown(); // Decrease timeLeft by 1, return true if timeLeft=0, false otherwise
         bool hasOrdersLeft() const override;
         bool canTakeOrder(const Order &order) const override;
         void acceptOrder(const Order &order) override;
