@@ -1,6 +1,6 @@
 #include "Action.h"
 #include <iostream> 
-
+using namespace std; //Solve the problem of the cout. Or we need to write the before our cout std::
 
 
 
@@ -32,13 +32,13 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
  {
     for(Order* order : wareHouse.getPendingOrders())
     {
-        if(*order->getStatus() == OrderStatus::PENDING)
+        if(order->getStatus() == OrderStatus::PENDING)
         {
             for(Volunteer* vol : wareHouse.getVolunteers())
             {
-                if(vol->canTakeOrder(order))
+                if(vol->canTakeOrder(*order))
                 {
-                    vol->acceptOrder(order);
+                    vol->acceptOrder(*order);
                 }
             }
         }

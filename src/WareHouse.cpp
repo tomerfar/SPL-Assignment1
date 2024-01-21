@@ -64,7 +64,7 @@ Order &WareHouse:: getOrder (int orderId) const
     {
         if(ord->getId() == orderId)
         {
-            return *ord
+            return *ord;
         }
     }
     for(Order* ord : inProcessOrders)
@@ -80,16 +80,14 @@ Order &WareHouse:: getOrder (int orderId) const
         {
             return *ord;
         }
-    }
+    } 
+    
+}
 
-void WareHouse:: close()
-{
-    isOpen = false;
-}
 int WareHouse:: getCustomerCounter()
-{
-    return customerCounter;
-}
+    {
+        return customerCounter;
+    }
 
 int WareHouse:: getOrderCounter()
 {
@@ -100,10 +98,6 @@ int WareHouse:: getVolunteerCounter()
 {
     return volunteerCounter;
 }
-    
-    
-}
-
 
 
 
