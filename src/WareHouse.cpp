@@ -1,17 +1,20 @@
 #include "WareHouse.h"
+#include <iostream> 
+using namespace std;
 
 
 
-WareHouse:: WareHouse(const string &configFilePath) 
+WareHouse:: WareHouse(const string &configFilePath):
+isOpen(1), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), 
+customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
-
+    // parse(configFilePath) implement parser 
+    start();
 }
-
 
 void WareHouse:: start()
 {
-isOpen = true;
-//need to check if we print here warehouse is open or do other things.
+cout << "Warehouse is open!" << endl;
 
 }
 
@@ -22,15 +25,16 @@ void WareHouse:: addOrder(Order* order)
    
 }
 
- void WareHouse:: addAction(BaseAction* action)
+ void WareHouse:: addCustomer(Customer* customer)
  {
-    
+    customerCounter++;
+    customers.push_back(customer);
  }
 
-
-// CivilianCustomer dne(-1, "Does Not Exist", -1, -1); // default customer if id doesn't exist
-
-
+ void WareHouse:: addAction(BaseAction* action)
+ {
+    actionsLog.push_back(action);
+ }
 
 Customer& WareHouse:: getCustomer(int customerId) const
 {
@@ -84,10 +88,47 @@ Order &WareHouse:: getOrder (int orderId) const
     
 }
 
-int WareHouse:: getCustomerCounter()
+const vector<BaseAction*> &WareHouse:: getActions() const
+{
+    return actionsLog;
+}
+
+void WareHouse:: close()
+{
+    for(Order* ord : pendingOrders)
     {
-        return customerCounter;
+        cout << "OrderID: " << ord->getId() << ", CustomerID: " << ord->getCustomerId() << ", Status: " << 
+        ord->statusToString(ord->getStatus()) << endl;
     }
+    for(Order* ord : inProcessOrders)
+    {
+        cout << "OrderID: " << ord->getId() << ", CustomerID: " << ord->getCustomerId() << ", Status: " << 
+        ord->statusToString(ord->getStatus()) << endl;
+    }
+    for(Order* ord : completedOrders)
+    {
+        cout << "OrderID: " << ord->getId() << ", CustomerID: " << ord->getCustomerId() << ", Status: " << 
+        ord->statusToString(ord->getStatus()) << endl;
+    } 
+
+    isOpen = false;
+    
+    // this action prints all orders with their status
+    // changes its isOpen status, exits the loop and finishes the program
+    // Make sure you free all memory before finishing the program, so you won’t have memory leaks
+
+}
+
+void WareHouse:: open()
+{
+    isOpen = true;
+    // check what else it does and why is it diffrent than start()
+}
+
+int WareHouse:: getCustomerCounter()
+{
+    return customerCounter;
+}
 
 int WareHouse:: getOrderCounter()
 {

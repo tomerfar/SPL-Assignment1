@@ -1,5 +1,6 @@
 #include "Order.h"
 #include <iostream> //Check if necessary in this .cpp file
+using namespace std;
 
 
 //Constructor
@@ -49,7 +50,7 @@ Order::Order(int id, int customerId, int distance):
     return status;
   }
 
-   const std::string statusOrder(OrderStatus status){
+    const string Order:: statusToString(OrderStatus status) const{
     if (status == OrderStatus::PENDING){
         return "Pending";
     }
@@ -67,27 +68,35 @@ Order::Order(int id, int customerId, int distance):
     }
     return "None";
   }
-
-  const std::string Order::toString() const{
-    string str_collector = std::to_string(driverId);
-    if(collectorId == NO_VOLUNTEER)
-    {
+  const string Order::collectorToString() const // Convert collector id to string
+  {
+    string str_collector = to_string(collectorId);
+    if(collectorId == NO_VOLUNTEER){
         str_collector = "None";
     }
-    string str_driver = std::to_string(collectorId);
+    return str_collector;
+  }
+
+  const string Order::driverToString() const // Convert driver id to string
+  {
+    string str_driver = to_string(driverId);
     if(driverId == NO_VOLUNTEER){
         str_driver = "None";
     }
+    return str_driver;
+  }
+
+  const string Order::toString() const{
     
-     return "OrderId: " + std::to_string(id) +
+     return "OrderId: " + to_string(id) +
       "\n" 
-     + "OrderStatus: " + std::to_string(static_cast<int>(status)) + // need to check this line.
+     + "OrderStatus: " + this->statusToString(status) + 
       "\n" 
-     + "CustomerId: " + std::to_string(customerId) +
+     + "CustomerId: " + to_string(customerId) +
       "\n" 
-     + "Collector: " + str_collector + 
+     + "Collector: " + this->collectorToString() + 
      "\n" 
-     + "Driver: " + str_driver;
+     + "Driver: " + this->driverToString();
   }
 
 

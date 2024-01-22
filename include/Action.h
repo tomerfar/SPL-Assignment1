@@ -16,7 +16,7 @@ enum class CustomerType{
 
 class BaseAction{
     public:
-        BaseAction();
+        BaseAction(); // check if we need to implement default constructor 
         ActionStatus getStatus() const;
         virtual void act(WareHouse& wareHouse)=0;
         virtual string toString() const=0;
@@ -61,6 +61,7 @@ class AddCustomer : public BaseAction {
         void act(WareHouse &wareHouse) override;
         AddCustomer *clone() const override;
         string toString() const override;
+        string customerTypeToString(CustomerType type); // Added myself
     private:
         const string customerName;
         const CustomerType customerType;
