@@ -23,7 +23,7 @@ void BaseAction:: error(string errorMsg)
 
 string BaseAction:: getErrorMsg() const
 {
-    // add later
+    // add later לבדוק אם צריך להכניס פה תבניות של כל אפשרויות השגיאה האפשריות
 }
 
 SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
@@ -82,16 +82,9 @@ void AddOrder:: act(WareHouse &wareHouse)
 
 //---AddCustomer---------------------------------------------------------------------------------------
 AddCustomer:: AddCustomer(string customerName, string customerType, int distance, int maxOrders): BaseAction(),
-  customerName(customerName), distance(distance), maxOrders(maxOrders){
-    if (customerType == "Soldier")
-    {
-        this->customerType = CustomerType::Soldier;
-    }
-    else
-    {
-        this->customerType = CustomerType::Civilian;
-    }
-}
+  customerName(customerName), distance(distance), maxOrders(maxOrders), customerType((customerType == "Soldier") ? CustomerType::Soldier : CustomerType::Civilian)
+   {};
+   // the ? operator checks to see if the customer type is Soldier or Civilian and gives the right type according to the string.
 
 //Methods
 void AddCustomer::act(WareHouse &wareHouse)
@@ -99,13 +92,15 @@ void AddCustomer::act(WareHouse &wareHouse)
     int customerId = wareHouse.getCustomerCounter();
     if(this->customerType == CustomerType::Soldier)
     {
-        Customer newCustomer = SoldierCustomer(customerId, customerName, distance, maxOrders);
+        SoldierCustomer newCustomer = SoldierCustomer(customerId, customerName, distance, maxOrders);
+        wareHouse.addCustomer(&newCustomer);
     }
     else
     {
-        Customer newCustomer = CivilianCustomer(customerId, customerName, distance, maxOrders);
+        CivilianCustomer newCustomer = CivilianCustomer(customerId, customerName, distance, maxOrders);
+        wareHouse.addCustomer(&newCustomer);
     }
-    wareHouse.addCustomer(newCustomer);
+    
     complete();
     
 }
@@ -123,7 +118,7 @@ string AddCustomer:: customerTypeToString(CustomerType type) //Convert the enum 
 
 string AddCustomer:: toString() const
 {
-    cout << "customer " << this->customerName << "" + this->customerType << "" << this->distance << "" << this->maxOrders << "" << endl;
+    cout << "customer " << this->customerName << this->customerType << this->distance << this->maxOrders << endl;
     // std_type = (*this).customerTypeToString(customerType);
     // return "Customer name: " + customerName + 
     // "\n"
@@ -144,18 +139,85 @@ AddCustomer *AddCustomer:: clone() const
 //---PrintOrder--------------------------------------------------------------------------------------
  //Constructor
  PrintOrderStatus::PrintOrderStatus(int id):
- BaseAction(), id(id){};
+ BaseAction(), orderId(id){};
 
  //Methods
- void PrintOrder:: act(WareHouse& wareHouse)
+ void PrintOrderStatus:: act(WareHouse& wareHouse)
  {
-    Order *ord = warehouse.getOrder(id);
+    Order *ord = wareHouse.getOrder(this->orderId);
     cout << ord->toString() << endl;
  }
- string PrintOrder:: toString() const
- {
-    cout << "orderStatus " <<  this->id << this->getstatus() << endl;
- }
+
+ PrintOrderStatus *PrintOrderStatus:: clone() const
+{
+    return new PrintOrderStatus(*this);
+}
+
+string PrintOrderStatus:: toString() const
+{
+    string statusString = "orderStatus" + to_string(orderId) + ":";
+    switch (getStatus())
+    {
+    case ActionStatus::COMPLETED:
+        statusString += "COMPLETED";
+        break;
+    
+    case ActionStatus::ERROR:
+         statusString += "ERROR";
+        break;
+    }
+    return statusString;
+}
+//---PrintOrder--------------------------------------------------------------------------------------
+
+//---PrintCustomerStatus-----------------------------------------------------------------------------
+//Constructors
+PrintCustomerStatus::PrintCustomerStatus(int CustomerId):
+BaseAction(), customerId(customerId){};
+
+//Methods
+void PrintCustomerStatus:: act(WareHouse &wareHouse)
+{
+    if (wareHouse.getCustomerCounter() > this->customerId)
+    {
+        error("Customer doesn't exist.");
+        cout << getErrorMsg() << endl; // לבדוק אם זה נכון  
+    }
+    else
+    {
+        Customer *cus = wareHouse.getCustomer(this->customerId);
+        cout << "Customer Id: " << to_string(cus->getId()) << endl;
+        for(int orderId : cus->getOrdersIds())
+        {
+            Order *ord = wareHouse.getOrder(orderId);
+            cout << "OrderID: " << to_string(orderId) << endl;
+            cout << "OrderStatus: " << ord->statusToString(ord->getStatus()) << endl;
+        }
+    }
+}
+
+PrintCustomerStatus *PrintCustomerStatus:: clone() const
+{
+    return new PrintCustomerStatus(*this);
+}
+
+string PrintCustomerStatus:: toString() const
+{
+    string customerString = "customerStatus" + to_string(this->customerId) + ":";
+    switch (getStatus())
+    {
+    case ActionStatus::COMPLETED:
+        customerString += "COMPLETED";
+        break;
+    
+    case ActionStatus::ERROR:
+    customerString += "ERROR";
+        break;
+    }
+    return customerString;
+}
+
+
 
 
  

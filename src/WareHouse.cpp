@@ -36,7 +36,7 @@ void WareHouse:: addOrder(Order* order)
     actionsLog.push_back(action);
  }
 
-Customer& WareHouse:: getCustomer(int customerId) const
+Customer &WareHouse:: getCustomer(int customerId) const
 {
     // need to ask whether we can get a non exitsing customer
     for(Customer* cus: customers)
