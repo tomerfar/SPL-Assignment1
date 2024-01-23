@@ -136,7 +136,7 @@ AddCustomer *AddCustomer:: clone() const
 }
 
 
-//---PrintOrder--------------------------------------------------------------------------------------
+//---PrintStatusOrder--------------------------------------------------------------------------------------
  //Constructor
  PrintOrderStatus::PrintOrderStatus(int id):
  BaseAction(), orderId(id){};
@@ -144,8 +144,8 @@ AddCustomer *AddCustomer:: clone() const
  //Methods
  void PrintOrderStatus:: act(WareHouse& wareHouse)
  {
-    Order *ord = wareHouse.getOrder(this->orderId);
-    cout << ord->toString() << endl;
+    Order &ord = wareHouse.getOrder(this->orderId); // getOrder returns a refernce to the order, which is why we create a refernce argument
+    cout << ord.toString() << endl;
  }
 
  PrintOrderStatus *PrintOrderStatus:: clone() const
@@ -168,9 +168,9 @@ string PrintOrderStatus:: toString() const
     }
     return statusString;
 }
-//---PrintOrder--------------------------------------------------------------------------------------
+//---PrintStatusOrder--------------------------------------------------------------------------------------
 
-//---PrintCustomerStatus-----------------------------------------------------------------------------
+//---PrintCustomerStatus-----------------------------------------------------------------------------------
 //Constructors
 PrintCustomerStatus::PrintCustomerStatus(int CustomerId):
 BaseAction(), customerId(customerId){};
@@ -178,20 +178,20 @@ BaseAction(), customerId(customerId){};
 //Methods
 void PrintCustomerStatus:: act(WareHouse &wareHouse)
 {
-    if (wareHouse.getCustomerCounter() > this->customerId)
+    if (this->customerId > wareHouse.getCustomerCounter())
     {
         error("Customer doesn't exist.");
         cout << getErrorMsg() << endl; // לבדוק אם זה נכון  
     }
     else
     {
-        Customer *cus = wareHouse.getCustomer(this->customerId);
-        cout << "Customer Id: " << to_string(cus->getId()) << endl;
-        for(int orderId : cus->getOrdersIds())
+        Customer &cus = wareHouse.getCustomer(this->customerId);
+        cout << "Customer Id: " << to_string(cus.getId()) << endl;
+        for(int orderId : cus.getOrdersIds())
         {
-            Order *ord = wareHouse.getOrder(orderId);
+            Order &ord = wareHouse.getOrder(orderId);
             cout << "OrderID: " << to_string(orderId) << endl;
-            cout << "OrderStatus: " << ord->statusToString(ord->getStatus()) << endl;
+            cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << endl;
         }
     }
 }
@@ -217,9 +217,35 @@ string PrintCustomerStatus:: toString() const
     return customerString;
 }
 
+//---PrintCustomerStatus-----------------------------------------------------------------------------------
+//Constructors
+ PrintVolunteerStatus::PrintVolunteerStatus(int id):
+ BaseAction(), volunteerId(id){};
 
+ //Methods
+ void PrintVolunteerStatus:: act(WareHouse &wareHouse)
+ {
+    if(this->volunteerId > wareHouse.getVolunteerCounter())
+    {
+        error("volunteer doesn't exist.");
+        cout << getErrorMsg() << endl; // לבדוק אם זה נכון 
+    }
+    else
+    {
+        Volunteer &vol = wareHouse.getVolunteer(volunteerId);
+        // needs to see what type of volunteer is this and if he is limited or not, and print accordingly.
+    }
+ }
 
+  PrintVolunteerStatus *PrintVolunteerStatus:: clone() const
+  {
+    return new PrintVolunteerStatus(*this);
+  }
 
+   string PrintVolunteerStatus:: toString() const
+   {
+
+   }
  
  
 
