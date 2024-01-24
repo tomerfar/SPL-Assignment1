@@ -10,7 +10,7 @@ class BaseAction;
 class Volunteer;
 
 // Warehouse responsible for Volunteers, Customers Actions, and Orders.
-
+extern WareHouse* backup; // Check to see it needed to instantiated here!!!!
 
 class WareHouse {
 
@@ -31,9 +31,11 @@ class WareHouse {
         vector<Order*> getInProcessOrders();
         vector<Order*> getCompletedOrders();
         vector<Volunteer*> getVolunteers();
+        vector<Customer*> getCustomers();
         int getCustomerCounter();
         int getOrderCounter();
         int getVolunteerCounter();
+        //needs to delete volunteers if they finish
 
 
     private:
