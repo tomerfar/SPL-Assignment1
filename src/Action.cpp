@@ -17,14 +17,21 @@ void BaseAction:: complete()
 void BaseAction:: error(string errorMsg)
 {
     status = ActionStatus:: ERROR;
+    this-> errorMsg = errorMsg;
     // update error message and print on screen: “Error: <error_msg>”
     // add later
 }
 
 string BaseAction:: getErrorMsg() const
 {
+    printErrorMsg(); // Call the function that will pring ther error msg to the screen.
+    return errorMsg;
     // add later לבדוק אם צריך להכניס פה תבניות של כל אפשרויות השגיאה האפשריות
 }
+void BaseAction:: printErrorMsg() const
+ {
+    cout << "Error:" << errorMsg << endl;
+ }
 
 SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
 

@@ -26,6 +26,7 @@ class BaseAction{
         void complete();
         void error(string errorMsg);
         string getErrorMsg() const;
+        void printErrorMsg() const; // Added myself, prints the error msg
 
     private:
         string errorMsg;
