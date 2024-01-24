@@ -1,5 +1,5 @@
 #include "Volunteer.h"
-
+using namespace std;
 
 //Constructor
 Volunteer::Volunteer(int id, const string &name) : id(id), name(name), activeOrderId(NO_ORDER), completedOrderId(NO_ORDER) {}
@@ -87,7 +87,7 @@ bool CollectorVolunteer:: canTakeOrder(const Order &order) const
 
 void CollectorVolunteer:: acceptOrder(const Order &order)  
 {
-    if (canTakeOrder)
+    if (canTakeOrder(order))
     {
         activeOrderId = order.getId();
         timeLeft = coolDown;
@@ -96,19 +96,19 @@ void CollectorVolunteer:: acceptOrder(const Order &order)
 
 string CollectorVolunteer:: toString() const
 {
-    string str_orderID = std::to_string(getActiveOrderId());
+    string str_orderID = to_string(getActiveOrderId());
     if(getActiveOrderId() == NO_ORDER)
     {
         str_orderID = "None";
     }
 
-    return "VolunteerID: " + std::to_string(getId()) + 
+    return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + std::to_string(isBusy()) + 
+    + "isBusy: " + to_string(isBusy()) + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
-    + "timeLeft: " + std::to_string(getTimeLeft()) + 
+    + "timeLeft: " + to_string(getTimeLeft()) + 
     "\n"
     + "ordersLeft: No Limit";
 }
@@ -163,15 +163,15 @@ string LimitedCollectorVolunteer::toString() const
         str_orderID = "None";
     }
 
-    return "VolunteerID: " + std::to_string(getId()) + 
+    return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + std::to_string(isBusy()) + 
+    + "isBusy: " + to_string(isBusy()) + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
-    + "timeLeft: " + std::to_string(getTimeLeft()) + 
+    + "timeLeft: " + to_string(getTimeLeft()) + 
     "\n"
-    + "ordersLeft: " + std::to_string(getNumOrdersLeft());
+    + "ordersLeft: " + to_string(getNumOrdersLeft());
 }
   
 
@@ -254,13 +254,13 @@ string DriverVolunteer:: toString() const
         str_orderID = "None";
     }
 
-    return "VolunteerID: " + std::to_string(getId()) + 
+    return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + std::to_string(isBusy()) + 
+    + "isBusy: " + to_string(isBusy()) + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
-    + "distanceLeft: " + std::to_string(getDistanceLeft()) + 
+    + "distanceLeft: " + to_string(getDistanceLeft()) + 
     "\n"
     + "ordersLeft: No Limit";
 }
@@ -314,15 +314,15 @@ bool LimitedDriverVolunteer:: canTakeOrder(const Order &order) const
         str_orderID = "None";
     }
 
-    return "VolunteerID: " + std::to_string(getId()) + 
+    return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + std::to_string(isBusy()) + 
+    + "isBusy: " + to_string(isBusy()) + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
-    + "distanceLeft: " + std::to_string(getDistanceLeft()) + 
+    + "distanceLeft: " + to_string(getDistanceLeft()) + 
     "\n"
-    + "ordersLeft: " + std::to_string(getNumOrdersLeft());
+    + "ordersLeft: " + to_string(getNumOrdersLeft());
  }
 
 

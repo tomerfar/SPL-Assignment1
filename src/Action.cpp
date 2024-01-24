@@ -4,6 +4,7 @@ using namespace std; //Solve the problem of the cout. Or we need to write the be
 
 
 
+//---BaseAction---------------------------------------------------------------------------------------
 ActionStatus BaseAction:: getStatus() const
 {
     return status;
@@ -33,6 +34,9 @@ void BaseAction:: printErrorMsg() const
     cout << "Error:" << errorMsg << endl;
  }
 
+//---BaseAction------------------------------------------------------------------------------------------
+
+//---Simulate Step---------------------------------------------------------------------------------------
 SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
 
  void SimulateStep:: act(WareHouse &wareHouse)
@@ -56,9 +60,14 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
  }
 
  
+//---SimulateStep---------------------------------------------------------------------------------------
 
+ 
+//---AddOrder-------------------------------------------------------------------------------------------
+//Constructor
 AddOrder:: AddOrder(int id) : BaseAction(), customerId(id) {};
 
+//Methods
 void AddOrder:: act(WareHouse &wareHouse)
 {
     if (customerId > wareHouse.getCustomerCounter()) 
@@ -86,8 +95,11 @@ void AddOrder:: act(WareHouse &wareHouse)
 }
 
 
+//---AddOrder-------------------------------------------------------------------------------------------
 
-//---AddCustomer---------------------------------------------------------------------------------------
+
+//---AddCustomer----------------------------------------------------------------------------------------
+//Constructor
 AddCustomer:: AddCustomer(string customerName, string customerType, int distance, int maxOrders): BaseAction(),
   customerName(customerName), distance(distance), maxOrders(maxOrders), customerType((customerType == "Soldier") ? CustomerType::Soldier : CustomerType::Civilian)
    {};
@@ -112,7 +124,7 @@ void AddCustomer::act(WareHouse &wareHouse)
     
 }
 
-string AddCustomer:: customerTypeToString(CustomerType type) //Convert the enum type to a string. check if neccesary
+string AddCustomer:: customerTypeToString(CustomerType type) const //Convert the enum type to a string. check if neccesary
 {
     switch (type) 
     {
@@ -125,22 +137,17 @@ string AddCustomer:: customerTypeToString(CustomerType type) //Convert the enum 
 
 string AddCustomer:: toString() const
 {
-    cout << "customer " << this->customerName << this->customerType << this->distance << this->maxOrders << endl;
-    // std_type = (*this).customerTypeToString(customerType);
-    // return "Customer name: " + customerName + 
-    // "\n"
-    // + "Customer type: " + std_type + 
-    // "\n"
-    // + "distance " + to_string(distance) + 
-    // "\n"
-    // + "maxOrders " + to_string(maxOrders); 
-    // ALL OF THIS NEEDS TO GO ON PRINT CUSTOMER STATUS!!!!
+    string customerString;
+    customerString ="customer " + this->customerName + this->customerTypeToString(customerType)
+     + to_string(this->distance) + to_string(this->maxOrders);
 }
 
 AddCustomer *AddCustomer:: clone() const
 {
     return new AddCustomer(*this);
 }
+
+//---AddCustomer-------------------------------------------------------------------------------------------
 
 
 //---PrintStatusOrder--------------------------------------------------------------------------------------
@@ -225,6 +232,8 @@ string PrintCustomerStatus:: toString() const
 }
 
 //---PrintCustomerStatus-----------------------------------------------------------------------------------
+
+//---PrintVolunteerStatus----------------------------------------------------------------------------------
 //Constructors
  PrintVolunteerStatus::PrintVolunteerStatus(int id):
  BaseAction(), volunteerId(id){};
@@ -234,26 +243,99 @@ string PrintCustomerStatus:: toString() const
  {
     if(this->volunteerId > wareHouse.getVolunteerCounter())
     {
-        error("volunteer doesn't exist.");
+        error("Volunteer doesn't exist.");
         cout << getErrorMsg() << endl; // לבדוק אם זה נכון 
     }
     else
     {
         Volunteer &vol = wareHouse.getVolunteer(volunteerId);
-        // needs to see what type of volunteer is this and if he is limited or not, and print accordingly.
+        cout << vol.toString() << endl;
+        // we use in this function in the toString methods that were made insidie the volunteer class.
     }
  }
 
-  PrintVolunteerStatus *PrintVolunteerStatus:: clone() const
+PrintVolunteerStatus *PrintVolunteerStatus:: clone() const
   {
     return new PrintVolunteerStatus(*this);
   }
 
-   string PrintVolunteerStatus:: toString() const
+string PrintVolunteerStatus:: toString() const
    {
-
+    string volunteerString = "volunteerStatus" + to_string(this->volunteerId) + ":";
+    switch (getStatus())
+    {
+    case ActionStatus::COMPLETED:
+        volunteerString += "COMPLETED";
+        break;
+    
+    case ActionStatus::ERROR:
+    volunteerString += "ERROR";
+        break;
+    }
+    return volunteerString;
    }
- 
+//---PrintVolunteerStatus-----------------------------------------------------------------------------------
+
+//---PrintActionsLog----------------------------------------------------------------------------------------
+
+//---PrintActionsLog----------------------------------------------------------------------------------------
+
+
+//---Close--------------------------------------------------------------------------------------------------
+
+//---Close--------------------------------------------------------------------------------------------------
+
+
+//---BackupWareHouse----------------------------------------------------------------------------------------
+//Constructor
+ BackupWareHouse::BackupWareHouse(): BaseAction(){};
+
+ //Methods
+ void BackupWareHouse:: act(WareHouse &wareHouse)
+ {
+    *backup = wareHouse; //use the assignment operator, needs to create it
+ }
+
+ BackupWareHouse *BackupWareHouse:: clone() const
+ {
+    return new BackupWareHouse(*this);
+ }
+
+  string BackupWareHouse:: toString() const
+  {
+
+  }
+//---BackupWareHouse----------------------------------------------------------------------------------------
+
+
+//---RestoreWareHouse---------------------------------------------------------------------------------------
+//Constructor
+RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
+
+//Methods
+ void RestoreWareHouse:: act(WareHouse &wareHouse)
+ {
+    wareHouse = *backup; // use the assignment operator again, needs to create it
+ }
+
+ RestoreWareHouse *RestoreWareHouse:: clone() const
+ {
+    return new RestoreWareHouse(*this);
+ }
+
+string RestoreWareHouse:: toString() const
+{
+
+}
+
+
+
+
+//---RestoreWareHouse---------------------------------------------------------------------------------------
+
+
+
+
  
 
 
