@@ -338,11 +338,38 @@ vector<Customer*> WareHouse:: getCustomers()
 void WareHouse:: transferToInProcess(Order* ord)
 {
     inProcessOrders.push_back(ord);
-    pendingOrders.erase(ord); // need to add iterator
+    for (auto it = getPendingOrders().begin(); it != getPendingOrders().end(); ++it) //Finds the order we want to delete and erase it
+    {
+        if(*it= ord)
+        {
+            getPendingOrders().erase(it);
+            break;
+        }
+    }
 }
 
 void WareHouse:: transferToPending(Order* ord)
 {
     pendingOrders.push_back(ord);
-    inProcessOrders.erase(ord); // need to add iterator
+    for (auto it = getInProcessOrders().begin(); it != getInProcessOrders().end(); ++it) //Finds the order we want to delete and erase it
+    {
+        if(*it= ord)
+        {
+            getInProcessOrders().erase(it);
+            break;
+        }
+    }
+}
+
+void WareHouse:: transferToCompleted(Order* ord)
+{
+    completedOrders.push_back(ord);
+    for (auto it = getCompletedOrders().begin(); it != getInProcessOrders().end(); ++it) //Finds the order we want to delete and erase it
+    {
+        if(*it= ord)
+        {
+            getInProcessOrders().erase(it);
+            break;
+        }
+    }
 }

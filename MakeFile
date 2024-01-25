@@ -1,26 +1,26 @@
-all: clean bin/cRace
+CXX = g++
+CXXFLAGS = -g -Wall -std=c++11
+CPPFLAGS = -I ./include -MMD -MP
 
-bin/cRace: bin/main.o bin/Order.o bin/Customer.o  bin/Volunteer.o bin/Action.o bin/WareHouse.o
-	g++ -o bin/cRace bin/main.o bin/Order.o bin/Customer.o bin/Volunteer.o bin/Action.o bin/WareHouse.o
+SRCS = $(wildcard ./src/*.cpp)
+OBJS = $(patsubst ./src/%.cpp,./bin/%.o, $(SRCS))
+DEPS := $(patsubst %.o,%.d, $(OBJS))
 
-bin/main.o: src/main.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/main.o src/main.cpp
+# default target
+all: ./bin/WareHouse
 
-bin/Order.o: src/Order.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Order.o src/Order.cpp
+# build WareHouse
+./bin/WareHouse: $(OBJS)
+	@echo "Building ..."
+	$(CXX) $(OBJS) -o $@
+	@echo "Finished building"
 
-bin/Customer.o: src/Customer.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Customer.o src/Customer.cpp
+# build cpp files
+./bin/%.o: ./src/%.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
-bin/Volunteer.o: src/Volunteer.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Volunteer.o src/Volunteer.cpp
-
-bin/Action.o: src/Action.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/Action.o src/Action.cpp
-
-bin/WareHouse.o: src/WareHouse.cpp
-	g++ -g -Wall -Weffc++ -std=c++11 -c -Iinclude -o bin/WareHouse.o src/WareHouse.cpp
-
-
+# clean build files
 clean:
-	rm -f bin/*
+	@rm -f ./bin/*
+
+-include $(DEPS)

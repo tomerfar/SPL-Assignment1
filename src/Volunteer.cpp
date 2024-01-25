@@ -42,7 +42,13 @@ CollectorVolunteer *CollectorVolunteer::clone() const
 
 void CollectorVolunteer:: step() 
 {
-    
+    if(decreaseCoolDown())
+    {
+      completedOrderId = activeOrderId; //volunteer finished with the order, will be free to accept more orders now
+      activeOrderId = NO_ORDER;
+        // needs to change isBusy status here to false, maybe add a function for it.
+        //check what to do with the limited collector, maybe he can be deleted afterwards
+    }
 }
  
  
@@ -144,6 +150,7 @@ int LimitedCollectorVolunteer:: getNumOrdersLeft() const
 {
     return ordersLeft;
 }
+
 string LimitedCollectorVolunteer::toString() const
 {
     string str_orderID = std::to_string(getActiveOrderId());
@@ -229,7 +236,12 @@ void DriverVolunteer:: acceptOrder(const Order &order)
 
 void  DriverVolunteer:: step() // Decrease distanceLeft by distancePerStep
 {
-    bool dis = decreaseDistanceLeft();
+    if(decreaseDistanceLeft)
+    {
+        completedOrderId = activeOrderId; //volunteer finished with the order, will be free to accept more orders now
+        activeOrderId = NO_ORDER;
+        // needs to change isBusy status here to false, maybe add a function for it.
+    }
 }
 
 
@@ -291,6 +303,7 @@ bool LimitedDriverVolunteer:: canTakeOrder(const Order &order) const
     DriverVolunteer::acceptOrder(order);
     ordersLeft--;  
  }
+ 
  string LimitedDriverVolunteer::toString() const
  {
      string str_orderID = to_string(getActiveOrderId());
@@ -298,7 +311,6 @@ bool LimitedDriverVolunteer:: canTakeOrder(const Order &order) const
     {
         str_orderID = "None";
     }
-
     return "VolunteerID: " + to_string(getId()) + 
     "\n"
     + "isBusy: " + to_string(isBusy()) + 

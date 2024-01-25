@@ -50,6 +50,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
 
  void SimulateStep:: act(WareHouse &wareHouse)
  {
+    for(int i = 0; i <= numOfSteps; i++){
     for(Order* order : wareHouse.getPendingOrders())
     {
         if(order->getStatus() == OrderStatus::PENDING)
@@ -80,8 +81,12 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
     for(Volunteer* vol : wareHouse.getVolunteers())
     {
         vol->step();
+        
     }
-    
+
+
+    complete(); // this action never returns an error
+    }
  }
 
  
