@@ -5,6 +5,8 @@
 using std::string;
 using std::vector;
 
+extern WareHouse* backup; // check to see if is should be here
+
 enum class ActionStatus{
     COMPLETED, ERROR
 };
@@ -62,7 +64,7 @@ class AddCustomer : public BaseAction {
         void act(WareHouse &wareHouse) override;
         AddCustomer *clone() const override;
         string toString() const override;
-        string customerTypeToString(CustomerType type); // Added myself
+        string customerTypeToString(CustomerType type) const; // Added myself
     private:
         const string customerName;
         const CustomerType customerType;

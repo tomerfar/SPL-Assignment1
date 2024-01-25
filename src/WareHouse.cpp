@@ -14,6 +14,10 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 }
 
 //Destructor
+WareHouse::~WareHouse()
+{
+    clearData();
+}
 
 //Destructor
 
@@ -108,7 +112,7 @@ WareHouse& WareHouse::operator=(const WareHouse& other)
 void WareHouse:: start()
 {
 cout << "Warehouse is open!" << endl;
-
+open();
 }
 
 void WareHouse:: addOrder(Order* order)
