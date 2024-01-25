@@ -16,6 +16,8 @@ class WareHouse {
 
     public:
         WareHouse(const string &configFilePath);
+        WareHouse& operator=(const WareHouse& other); //CopyAssignmentOperator
+        void clearData(); // Added myself, clears the data of an object
         void start();
         void addOrder(Order* order);
         void addAction(BaseAction* action);

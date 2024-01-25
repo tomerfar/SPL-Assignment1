@@ -293,7 +293,17 @@ string PrintVolunteerStatus:: toString() const
  //Methods
  void BackupWareHouse:: act(WareHouse &wareHouse)
  {
-    *backup = wareHouse; //use the assignment operator, needs to create it
+    if(backup == nullptr) //check to see if the address is empty, meaning backup isnt pointing to anything yet
+    {
+      backup = new WareHouse(wareHouse); //Activate the copy constructor
+      complete();
+    }
+    else
+    {
+     *backup = wareHouse;  // Activate the copy assigment operator
+     complete();
+    }
+   
  }
 
  BackupWareHouse *BackupWareHouse:: clone() const
@@ -303,7 +313,7 @@ string PrintVolunteerStatus:: toString() const
 
   string BackupWareHouse:: toString() const
   {
-
+    return "backup Completed";
   }
 //---BackupWareHouse----------------------------------------------------------------------------------------
 

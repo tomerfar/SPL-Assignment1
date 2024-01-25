@@ -1,4 +1,5 @@
 #include "WareHouse.h"
+#include "Action.h"
 #include <iostream> 
 using namespace std;
 
@@ -11,6 +12,98 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
     // parse(configFilePath) implement parser 
     start();
 }
+
+//Destructor
+
+//Destructor
+
+//clearData
+
+//clearData
+void WareHouse:: clearData()
+{
+     for (const Order* ord : pendingOrders)
+         { //Deletes all the pending orders
+          delete ord;
+         }
+        for (const Order* ord : inProcessOrders)
+        { //Deletes all the in prccess orders
+         delete ord;
+        }
+        for (const Order* ord : completedOrders)
+        { //Deletes all the completed orders
+         delete ord;
+        }
+        for (const Customer* cus : customers)
+        { //Deletes all the customers
+         delete cus;
+        }
+        for (const Volunteer* vol : volunteers)
+        { //Deletes all the volunteers
+         delete vol;
+        }
+        for (const BaseAction* action :actionsLog)
+        { //Deletes all the actions
+         delete action;
+        }
+       // Releases the memory associated with the vectors and remove all elements from it
+        pendingOrders.clear();
+        inProcessOrders.clear();
+        completedOrders.clear();
+        customers.clear();
+        volunteers.clear();
+        actionsLog.clear();
+}
+
+//CopyConstructor
+
+//CopyConstructor
+
+//CopyAssignmentOperator
+WareHouse& WareHouse::operator=(const WareHouse& other)
+{
+    if(this != &other)
+    {
+        clearData(); // Clears all data on the this object
+        //Copying fields
+        this->orderCounter = other.orderCounter;
+        this->customerCounter = other.customerCounter;
+        this->volunteerCounter = other.volunteerCounter;
+
+        for (const Order* otherOrder : other.pendingOrders)
+         { //Perform a deep copy of the pending orders
+            Order* newOrder = new Order(*otherOrder);
+            pendingOrders.push_back(newOrder);
+         }
+        for (const Order* otherOrder : other.inProcessOrders)
+        { //Perform a deep copy of the in proccess orders
+            Order* newOrder = new Order(*otherOrder);
+            inProcessOrders.push_back(newOrder);
+        }
+        for (const Order* otherOrder : other.completedOrders)
+        { //Perform a deep copy of the completed orders
+            Order* newOrder = new Order(*otherOrder);
+            completedOrders.push_back(newOrder);
+        }
+        for (const Customer* otherCustomer : other.customers)
+        { // Use the clone method to copy the customers
+            customers.push_back(otherCustomer->clone());
+        }
+        for (const Volunteer* otherVolunteer : other.volunteers)
+        { // Use the clone method to copy the volunteers
+            volunteers.push_back(otherVolunteer->clone());
+        }
+        for(const BaseAction* otherAction : other.actionsLog)
+        { // Use the clone method of each derived baseAction class to copy the actions
+            actionsLog.push_back(otherAction->clone());
+        }
+
+    return *this;
+}
+}
+//CopyAssignmentOperator
+
+
 
 void WareHouse:: start()
 {
@@ -33,7 +126,7 @@ void WareHouse:: addOrder(Order* order)
 
  void WareHouse:: addAction(BaseAction* action)
  {
-    actionsLog.push_back(action);
+    actionsLog.push_back(action);// need to check if we call it on every function since every action consider to be an action.!!!
  }
 
 Customer &WareHouse:: getCustomer(int customerId) const
