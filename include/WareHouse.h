@@ -17,7 +17,11 @@ class WareHouse {
     public:
         WareHouse(const string &configFilePath);
         ~WareHouse(); //Destructor
+        WareHouse(const WareHouse& other); // Copy Constructor
         WareHouse& operator=(const WareHouse& other); //Copy Assignment Operator
+        WareHouse(WareHouse&& other) noexcept; //Move Constructor
+        WareHouse& operator=(WareHouse&& other) noexcept; // Move Assignment Operator
+
         void clearData(); // Added myself, clears the data of an object
         void start();
         void addOrder(Order* order);
@@ -38,6 +42,10 @@ class WareHouse {
         int getCustomerCounter();
         int getOrderCounter();
         int getVolunteerCounter();
+
+        void transferToInProcess(Order* ord);
+        void transferToPending(Order* ord);
+        
         //needs to delete volunteers if they finish
 
 

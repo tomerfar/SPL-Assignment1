@@ -27,6 +27,7 @@ string BaseAction:: getErrorMsg() const
     printErrorMsg(); // Call the function that will pring ther error msg to the screen.
     return errorMsg;
 }
+
 void BaseAction:: printErrorMsg() const
  {
     cout << "Error:" << errorMsg << endl;
@@ -58,11 +59,27 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
                 if(vol->canTakeOrder(*order))
                 {
                     vol->acceptOrder(*order);
+                    order->setCollectorId(vol->getId());
+                    order->setStatus(OrderStatus::COLLECTING);
+                    wareHouse.transferToInProcess(order);
+                }
+            }
+        } else { // if Collecting 
+            for(Volunteer* vol : wareHouse.getVolunteers())
+            {
+                if(vol->canTakeOrder(*order))
+                {
+                    vol->acceptOrder(*order);
+                    order->setDriverId(vol->getId());
+                    order->setStatus(OrderStatus::DELIVERING);
+                    wareHouse.transferToInProcess(order);
                 }
             }
         }
-         
-        
+    }
+    for(Volunteer* vol : wareHouse.getVolunteers())
+    {
+        vol->step();
     }
     
  }
@@ -78,25 +95,27 @@ AddOrder:: AddOrder(int id) : BaseAction(), customerId(id), orderId(0) {};
 //Methods
 void AddOrder:: act(WareHouse &wareHouse)
 {
+    wareHouse.addAction(this);
+
     if (customerId > wareHouse.getCustomerCounter()) 
     {
         error("Cannot place this order. Customer does not exist.");  
         cout << getErrorMsg() << endl;
-    }
+    } else {
 
-    Customer &cus = wareHouse.getCustomer(customerId);
+        Customer &cus = wareHouse.getCustomer(customerId);
 
-    if(cus.canMakeOrder())
-    {
-        orderId = wareHouse.getOrderCounter();
-        Order *ord = new Order(orderId, customerId, cus.getCustomerDistance()); 
-        wareHouse.addOrder(ord);
-        cus.addOrder(ord->getId());
-        complete();
-    } 
-    else {
-        error("Cannot place this order. Customer has reached its order limit");
-        cout << getErrorMsg() << endl;
+        if(cus.canMakeOrder())
+        {
+            orderId = wareHouse.getOrderCounter();
+            Order *ord = new Order(orderId, customerId, cus.getCustomerDistance()); 
+            wareHouse.addOrder(ord);
+            cus.addOrder(ord->getId());
+            complete();
+        } else {
+            error("Cannot place this order. Customer has reached its order limit");
+            cout << getErrorMsg() << endl;
+        }
     }
 }
 
@@ -121,8 +140,9 @@ AddCustomer:: AddCustomer(string customerName, string customerType, int distance
    // the ? operator checks to see if the customer type is Soldier or Civilian and gives the right type according to the string.
 
 //Methods
-void AddCustomer::act(WareHouse &wareHouse)
+void AddCustomer::act(WareHouse &wareHouse) // add error
 {
+    wareHouse.addAction(this);
     int customerId = wareHouse.getCustomerCounter();
     if(this->customerType == CustomerType::Soldier)
     {
@@ -134,9 +154,7 @@ void AddCustomer::act(WareHouse &wareHouse)
         CivilianCustomer newCustomer = CivilianCustomer(customerId, customerName, distance, maxOrders);
         wareHouse.addCustomer(&newCustomer);
     }
-    
     complete();
-    
 }
 
 string AddCustomer:: customerTypeToString(CustomerType type) const //Convert the enum type to a string. check if neccesary
@@ -170,10 +188,18 @@ AddCustomer *AddCustomer:: clone() const
  BaseAction(), orderId(id){};
 
  //Methods
- void PrintOrderStatus:: act(WareHouse& wareHouse)
+ void PrintOrderStatus:: act(WareHouse& wareHouse) 
  {
-    Order &ord = wareHouse.getOrder(this->orderId); // getOrder returns a refernce to the order, which is why we create a refernce argument
-    cout << ord.toString() << endl; // check if correct
+    wareHouse.addAction(this);
+    if (orderId > wareHouse.getOrderCounter()) 
+    {
+        error("Order doesn't exist.");  
+        cout << getErrorMsg() << endl;
+    } else {
+        Order &ord = wareHouse.getOrder(orderId); 
+        cout << ord.toString() << endl; 
+        complete();
+    }
  }
 
  PrintOrderStatus *PrintOrderStatus:: clone() const
@@ -195,16 +221,17 @@ PrintCustomerStatus::PrintCustomerStatus(int CustomerId):
 BaseAction(), customerId(customerId){};
 
 //Methods
-void PrintCustomerStatus:: act(WareHouse &wareHouse)
+void PrintCustomerStatus:: act(WareHouse &wareHouse) 
 {
-    if (this->customerId > wareHouse.getCustomerCounter())
+    wareHouse.addAction(this);
+    if (customerId > wareHouse.getCustomerCounter())
     {
         error("Customer doesn't exist.");
         cout << getErrorMsg() << endl;  
     }
     else
     {
-        Customer &cus = wareHouse.getCustomer(this->customerId);
+        Customer &cus = wareHouse.getCustomer(customerId);
         cout << "Customer Id: " << to_string(cus.getId()) << endl;
         for(int orderId : cus.getOrdersIds())
         {
@@ -212,6 +239,7 @@ void PrintCustomerStatus:: act(WareHouse &wareHouse)
             cout << "OrderID: " << to_string(orderId) << endl;
             cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << endl;
         }
+        complete();
     }
 }
 
@@ -235,6 +263,7 @@ string PrintCustomerStatus:: toString() const // check if correct
  //Methods
  void PrintVolunteerStatus:: act(WareHouse &wareHouse)
  {
+    wareHouse.addAction(this);
     if(volunteerId > wareHouse.getVolunteerCounter())
     {
         error("Volunteer doesn't exist.");
@@ -244,6 +273,7 @@ string PrintCustomerStatus:: toString() const // check if correct
     {
         Volunteer &vol = wareHouse.getVolunteer(volunteerId);
         cout << vol.toString() << endl;
+        complete();
     }
  }
 
@@ -254,7 +284,7 @@ PrintVolunteerStatus *PrintVolunteerStatus:: clone() const
 
 string PrintVolunteerStatus:: toString() const
    {
-    return "volunteerStatus " + to_string(this->volunteerId) + " " + status_to_str();
+    return "volunteerStatus " + to_string(volunteerId) + " " + status_to_str();
    }
    
 //---PrintVolunteerStatus-----------------------------------------------------------------------------------
@@ -265,10 +295,12 @@ string PrintVolunteerStatus:: toString() const
 
 void PrintActionsLog:: act(WareHouse &wareHouse) 
 {
+    wareHouse.addAction(this);
     for(BaseAction* action : wareHouse.getActions())
     {
         cout<< this->toString() << endl;
     }
+    complete(); // This action never results in an error.
 }
 
 
@@ -293,23 +325,26 @@ string PrintActionsLog:: toString() const
 
 //check that we don't need to implement constructot (default given)
 
-    void Close:: act(WareHouse &wareHouse) 
-    {
-        wareHouse.close();
-        // see what else need to do 
-    }
+void Close:: act(WareHouse &wareHouse) // add error 
+{
+    wareHouse.addAction(this);
+    wareHouse.close();
+    // see what else need to do 
+    complete(); // This action never results in an error.
+    
+}
 
 
-    Close *Close:: clone() const
-    {
-        return new Close(*this);
-    }
+Close *Close:: clone() const
+{
+    return new Close(*this);
+}
 
 
-    string Close:: toString() const 
-    {
-        return "close "  + status_to_str();
-    }
+string Close:: toString() const 
+{
+    return "close "  + status_to_str();
+}
 
 //---Close--------------------------------------------------------------------------------------------------
 
@@ -319,19 +354,18 @@ string PrintActionsLog:: toString() const
  BackupWareHouse::BackupWareHouse(): BaseAction(){};
 
  //Methods
- void BackupWareHouse:: act(WareHouse &wareHouse)
+ void BackupWareHouse:: act(WareHouse &wareHouse) 
  {
+    wareHouse.addAction(this);
     if(backup == nullptr) //check to see if the address is empty, meaning backup isnt pointing to anything yet
     {
-      backup = new WareHouse(wareHouse); //Activate the copy constructor
-      complete();
+        backup = new WareHouse(wareHouse); //Activate the copy constructor      
     }
     else
     {
-     *backup = wareHouse;  // Activate the copy assigment operator
-     complete();
+        *backup = wareHouse;  // Activate the copy assigment operator
     }
-   
+   complete(); // This action never results in an error.
  }
 
  BackupWareHouse *BackupWareHouse:: clone() const
@@ -341,7 +375,7 @@ string PrintActionsLog:: toString() const
 
   string BackupWareHouse:: toString() const
   {
-    return "backup Completed";
+    return "backupWareHouse COMPLETED";
   }
 //---BackupWareHouse----------------------------------------------------------------------------------------
 
@@ -351,9 +385,19 @@ string PrintActionsLog:: toString() const
 RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
 
 //Methods
- void RestoreWareHouse:: act(WareHouse &wareHouse)
+ void RestoreWareHouse:: act(WareHouse &wareHouse) // add error
  {
-    wareHouse = *backup; // use the assignment operator again, needs to create it
+    if(backup == nullptr)
+    {
+        error("backup doesn't exist");
+        cout << getErrorMsg << endl;
+    }
+    else
+    {
+      wareHouse.addAction(this);
+      wareHouse = *backup;
+      complete();
+    }
  }
 
  RestoreWareHouse *RestoreWareHouse:: clone() const
@@ -363,7 +407,7 @@ RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
 
 string RestoreWareHouse:: toString() const
 {
-
+    return "restoreWareHouse " + status_to_str();
 }
 
 

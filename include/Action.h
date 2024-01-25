@@ -4,8 +4,7 @@
 #include "WareHouse.h"
 using std::string;
 using std::vector;
-
-extern WareHouse* backup; // check to see if is should be here
+extern WareHouse* backup;
 
 enum class ActionStatus{
     COMPLETED, ERROR
@@ -23,6 +22,7 @@ class BaseAction{
         virtual void act(WareHouse& wareHouse)=0;
         virtual string toString() const=0;
         virtual BaseAction* clone() const=0;
+        string status_to_str() const;                         // yuval added
 
     protected:
         void complete();
@@ -55,6 +55,7 @@ class AddOrder : public BaseAction {
         AddOrder *clone() const override;
     private:
         const int customerId;
+        int orderId; // yuval added for toString
 };
 
 

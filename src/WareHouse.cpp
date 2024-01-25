@@ -1,10 +1,11 @@
 #include "WareHouse.h"
 #include "Action.h"
+
 #include <iostream> 
 using namespace std;
 
 
-
+//Constructor
 WareHouse:: WareHouse(const string &configFilePath):
 isOpen(1), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), 
 customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
@@ -18,10 +19,7 @@ WareHouse::~WareHouse()
 {
     clearData();
 }
-
 //Destructor
-
-//clearData
 
 //clearData
 void WareHouse:: clearData()
@@ -58,9 +56,42 @@ void WareHouse:: clearData()
         volunteers.clear();
         actionsLog.clear();
 }
+//clearData
 
 //CopyConstructor
-
+WareHouse:: WareHouse(const WareHouse& other): isOpen(isOpen),
+ orderCounter(other.orderCounter),
+ customerCounter(other.customerCounter),
+ volunteerCounter(other.volunteerCounter)
+ {
+    for (const Order* otherOrder : other.pendingOrders)
+         { //Perform a deep copy of the pending orders
+            Order* newOrder = new Order(*otherOrder);
+            pendingOrders.push_back(newOrder);
+         }
+        for (const Order* otherOrder : other.inProcessOrders)
+        { //Perform a deep copy of the in proccess orders
+            Order* newOrder = new Order(*otherOrder);
+            inProcessOrders.push_back(newOrder);
+        }
+        for (const Order* otherOrder : other.completedOrders)
+        { //Perform a deep copy of the completed orders
+            Order* newOrder = new Order(*otherOrder);
+            completedOrders.push_back(newOrder);
+        }
+        for (const Customer* otherCustomer : other.customers)
+        { // Use the clone method to copy the customers
+            customers.push_back(otherCustomer->clone());
+        }
+        for (const Volunteer* otherVolunteer : other.volunteers)
+        { // Use the clone method to copy the volunteers
+            volunteers.push_back(otherVolunteer->clone());
+        }
+        for(const BaseAction* otherAction : other.actionsLog)
+        { // Use the clone method of each derived baseAction class to copy the actions
+            actionsLog.push_back(otherAction->clone());
+        }
+ }
 //CopyConstructor
 
 //CopyAssignmentOperator
@@ -107,6 +138,48 @@ WareHouse& WareHouse::operator=(const WareHouse& other)
 }
 //CopyAssignmentOperator
 
+//Move Constructor
+WareHouse::WareHouse(WareHouse&& other) noexcept:
+orderCounter(other.orderCounter), customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter),
+pendingOrders(move(other.pendingOrders)),
+inProcessOrders(move(other.inProcessOrders)),
+completedOrders(move(other.completedOrders)),
+customers(move(other.customers)),
+volunteers(move(other.volunteers)),
+actionsLog(move(other.actionsLog))
+{
+    //check what to do with the counter fields, they arent pointers so we cant set them do be nullptr
+   other.pendingOrders.clear();
+   other.inProcessOrders.clear();
+   other.completedOrders.clear();
+   other.customers.clear();
+   other.volunteers.clear();
+   other.actionsLog.clear();
+};
+//Move Constructor
+
+//Move Assignment Operator
+WareHouse& WareHouse::operator=(WareHouse&& other) noexcept
+{
+  if(this != &other)
+  {
+    clearData();
+    orderCounter = other.orderCounter;
+    customerCounter = other.customerCounter;
+    volunteerCounter = other.volunteerCounter;
+    pendingOrders = move(other.pendingOrders);
+    inProcessOrders = move(other.inProcessOrders);
+    completedOrders = move(other.completedOrders);
+    customers = move(other.customers);
+    volunteers = move(other.volunteers);
+    actionsLog = move(other.actionsLog);
+
+  }
+  return *this;
+}
+
+//Move Assignment Operator
+
 
 
 void WareHouse:: start()
@@ -119,7 +192,7 @@ void WareHouse:: addOrder(Order* order)
 {
    orderCounter++;
    pendingOrders.push_back(order);
-   
+
 }
 
  void WareHouse:: addCustomer(Customer* customer)
@@ -221,7 +294,7 @@ void WareHouse:: open()
     isOpen = true;
     // check what else it does and why is it diffrent than start()
 }
-
+//---getters----------------------------------------------------------------------------
 int WareHouse:: getCustomerCounter()
 {
     return customerCounter;
@@ -237,23 +310,39 @@ int WareHouse:: getVolunteerCounter()
     return volunteerCounter;
 }
 
+vector<Order*> WareHouse:: getPendingOrders()
+{
+     return pendingOrders;
+}
 
+vector<Order*> WareHouse:: getInProcessOrders()
+{
+     return inProcessOrders;
+}
 
-// vector<Order*> WareHouse:: getPendingOrders()
-// {
-//     return pendingOrders;
-// }
+vector<Order*> WareHouse:: getCompletedOrders()
+{
+     return completedOrders;
+}
+vector<Volunteer*> WareHouse:: getVolunteers()
+{
+     return volunteers;
+}
 
-// vector<Order*> WareHouse:: getInProcessOrders()
-// {
-//     return inProcessOrders;
-// }
+vector<Customer*> WareHouse:: getCustomers()
+{
+    return customers;
+}
+  //---getters----------------------------------------------------------------------------
 
-// vector<Order*> WareHouse:: getCompletedOrders()
-// {
-//     return completedOrders;
-// }
-//  vector<Volunteer*> WareHouse:: getVolunteers()
-//  {
-//     return volunteers;
-//  }
+void WareHouse:: transferToInProcess(Order* ord)
+{
+    inProcessOrders.push_back(ord);
+    pendingOrders.erase(ord); // need to add iterator
+}
+
+void WareHouse:: transferToPending(Order* ord)
+{
+    pendingOrders.push_back(ord);
+    inProcessOrders.erase(ord); // need to add iterator
+}
