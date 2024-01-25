@@ -20,19 +20,27 @@ void BaseAction:: error(string errorMsg)
     status = ActionStatus:: ERROR;
     this-> errorMsg = errorMsg;
     // update error message and print on screen: “Error: <error_msg>”
-    // add later
 }
 
 string BaseAction:: getErrorMsg() const
 {
     printErrorMsg(); // Call the function that will pring ther error msg to the screen.
     return errorMsg;
-    // add later לבדוק אם צריך להכניס פה תבניות של כל אפשרויות השגיאה האפשריות
 }
 void BaseAction:: printErrorMsg() const
  {
     cout << "Error:" << errorMsg << endl;
  }
+
+string BaseAction:: status_to_str() const // added by yuval
+{
+    switch (getStatus())
+    {
+        case ActionStatus:: COMPLETED:   return "COMPLETED";
+        case ActionStatus:: ERROR:   return "ERROR";
+        default: return "UNKNOWN";
+    }
+}
 
 //---BaseAction------------------------------------------------------------------------------------------
 
@@ -65,7 +73,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
  
 //---AddOrder-------------------------------------------------------------------------------------------
 //Constructor
-AddOrder:: AddOrder(int id) : BaseAction(), customerId(id) {};
+AddOrder:: AddOrder(int id) : BaseAction(), customerId(id), orderId(0) {};
 
 //Methods
 void AddOrder:: act(WareHouse &wareHouse)
@@ -74,26 +82,33 @@ void AddOrder:: act(WareHouse &wareHouse)
     {
         error("Cannot place this order. Customer does not exist.");  
         cout << getErrorMsg() << endl;
-        //Add status errors
     }
 
     Customer &cus = wareHouse.getCustomer(customerId);
 
     if(cus.canMakeOrder())
     {
-        Order *ord = new Order(wareHouse.getOrderCounter(), customerId, cus.getCustomerDistance()); 
+        orderId = wareHouse.getOrderCounter();
+        Order *ord = new Order(orderId, customerId, cus.getCustomerDistance()); 
         wareHouse.addOrder(ord);
         cus.addOrder(ord->getId());
         complete();
-        // add status complete
     } 
     else {
         error("Cannot place this order. Customer has reached its order limit");
         cout << getErrorMsg() << endl;
-        // add status error
     }
 }
 
+string AddOrder:: toString() const 
+{
+    return "order " + to_string(orderId) + " " + status_to_str(); 
+}
+
+AddOrder *AddOrder:: clone() const
+{
+    return new AddOrder(*this);
+}
 
 //---AddOrder-------------------------------------------------------------------------------------------
 
@@ -135,11 +150,10 @@ string AddCustomer:: customerTypeToString(CustomerType type) const //Convert the
     }
 }
 
-string AddCustomer:: toString() const
+string AddCustomer:: toString() const 
 {
-    string customerString;
-    customerString ="customer " + this->customerName + this->customerTypeToString(customerType)
-     + to_string(this->distance) + to_string(this->maxOrders);
+    return "customer " + customerName + " " + customerTypeToString(customerType) + " "
+     + to_string(distance) + " " + to_string(maxOrders);
 }
 
 AddCustomer *AddCustomer:: clone() const
@@ -159,7 +173,7 @@ AddCustomer *AddCustomer:: clone() const
  void PrintOrderStatus:: act(WareHouse& wareHouse)
  {
     Order &ord = wareHouse.getOrder(this->orderId); // getOrder returns a refernce to the order, which is why we create a refernce argument
-    cout << ord.toString() << endl;
+    cout << ord.toString() << endl; // check if correct
  }
 
  PrintOrderStatus *PrintOrderStatus:: clone() const
@@ -169,19 +183,10 @@ AddCustomer *AddCustomer:: clone() const
 
 string PrintOrderStatus:: toString() const
 {
-    string statusString = "orderStatus" + to_string(orderId) + ":";
-    switch (getStatus())
-    {
-    case ActionStatus::COMPLETED:
-        statusString += "COMPLETED";
-        break;
-    
-    case ActionStatus::ERROR:
-         statusString += "ERROR";
-        break;
-    }
-    return statusString;
+    return "orderStatus " + to_string(orderId) + " " + status_to_str();
 }
+
+
 //---PrintStatusOrder--------------------------------------------------------------------------------------
 
 //---PrintCustomerStatus-----------------------------------------------------------------------------------
@@ -195,7 +200,7 @@ void PrintCustomerStatus:: act(WareHouse &wareHouse)
     if (this->customerId > wareHouse.getCustomerCounter())
     {
         error("Customer doesn't exist.");
-        cout << getErrorMsg() << endl; // לבדוק אם זה נכון  
+        cout << getErrorMsg() << endl;  
     }
     else
     {
@@ -215,20 +220,9 @@ PrintCustomerStatus *PrintCustomerStatus:: clone() const
     return new PrintCustomerStatus(*this);
 }
 
-string PrintCustomerStatus:: toString() const
+string PrintCustomerStatus:: toString() const // check if correct
 {
-    string customerString = "customerStatus" + to_string(this->customerId) + ":";
-    switch (getStatus())
-    {
-    case ActionStatus::COMPLETED:
-        customerString += "COMPLETED";
-        break;
-    
-    case ActionStatus::ERROR:
-    customerString += "ERROR";
-        break;
-    }
-    return customerString;
+    return "customerStatus " + to_string(customerId) + " " + status_to_str();
 }
 
 //---PrintCustomerStatus-----------------------------------------------------------------------------------
@@ -241,16 +235,15 @@ string PrintCustomerStatus:: toString() const
  //Methods
  void PrintVolunteerStatus:: act(WareHouse &wareHouse)
  {
-    if(this->volunteerId > wareHouse.getVolunteerCounter())
+    if(volunteerId > wareHouse.getVolunteerCounter())
     {
         error("Volunteer doesn't exist.");
-        cout << getErrorMsg() << endl; // לבדוק אם זה נכון 
+        cout << getErrorMsg() << endl; 
     }
     else
     {
         Volunteer &vol = wareHouse.getVolunteer(volunteerId);
         cout << vol.toString() << endl;
-        // we use in this function in the toString methods that were made insidie the volunteer class.
     }
  }
 
@@ -261,27 +254,62 @@ PrintVolunteerStatus *PrintVolunteerStatus:: clone() const
 
 string PrintVolunteerStatus:: toString() const
    {
-    string volunteerString = "volunteerStatus" + to_string(this->volunteerId) + ":";
-    switch (getStatus())
-    {
-    case ActionStatus::COMPLETED:
-        volunteerString += "COMPLETED";
-        break;
-    
-    case ActionStatus::ERROR:
-    volunteerString += "ERROR";
-        break;
-    }
-    return volunteerString;
+    return "volunteerStatus " + to_string(this->volunteerId) + " " + status_to_str();
    }
+   
 //---PrintVolunteerStatus-----------------------------------------------------------------------------------
 
 //---PrintActionsLog----------------------------------------------------------------------------------------
+
+//check that we don't need to implement constructot (default given)
+
+void PrintActionsLog:: act(WareHouse &wareHouse) 
+{
+    for(BaseAction* action : wareHouse.getActions())
+    {
+        cout<< this->toString() << endl;
+    }
+}
+
+
+PrintActionsLog *PrintActionsLog:: clone() const
+{
+    return new PrintActionsLog(*this);
+}
+
+
+string PrintActionsLog:: toString() const 
+{
+    return "printActionsLog "  + status_to_str();
+}
+
+
 
 //---PrintActionsLog----------------------------------------------------------------------------------------
 
 
 //---Close--------------------------------------------------------------------------------------------------
+
+
+//check that we don't need to implement constructot (default given)
+
+    void Close:: act(WareHouse &wareHouse) 
+    {
+        wareHouse.close();
+        // see what else need to do 
+    }
+
+
+    Close *Close:: clone() const
+    {
+        return new Close(*this);
+    }
+
+
+    string Close:: toString() const 
+    {
+        return "close "  + status_to_str();
+    }
 
 //---Close--------------------------------------------------------------------------------------------------
 
@@ -342,17 +370,3 @@ string RestoreWareHouse:: toString() const
 
 
 //---RestoreWareHouse---------------------------------------------------------------------------------------
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
