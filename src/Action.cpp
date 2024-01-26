@@ -52,7 +52,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
  {
     for(int i = 0; i <= numOfSteps; i++){
     for(Order* order : wareHouse.getPendingOrders())
-    {
+    { 
         if(order->getStatus() == OrderStatus::PENDING)
         {
             for(Volunteer* vol : wareHouse.getVolunteers())
@@ -77,13 +77,31 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
                 }
             }
         }
+    } //Step 1 finished
+    for(Volunteer* vol : wareHouse.getVolunteers())
+    {
+        vol->step(); // Step 2 finished
     }
     for(Volunteer* vol : wareHouse.getVolunteers())
     {
-        vol->step();
-        
+        if(vol->getCompletedOrderId() != NO_ORDER) // means he finished with the order
+        {
+            Order& completedOrder = wareHouse.getOrder(vol->getCompletedOrderId());
+            if(completedOrder.getStatus() == OrderStatus::COLLECTING)
+            {
+                wareHouse.transferToPending(&completedOrder);
+            }
+            else // order status is delivering.
+            {
+                wareHouse.transferToCompleted(&completedOrder);
+            }
+         if(!vol->hasOrdersLeft() && vol->getCompletedOrderId() != NO_ORDER)
+            {
+                wareHouse.removeVolunteer(vol);
+            }
+            //Step 3 + 4 finished
+        }
     }
-
 
     complete(); // this action never returns an error
     }

@@ -46,6 +46,8 @@ class WareHouse {
         void transferToInProcess(Order* ord);
         void transferToPending(Order* ord);
         void transferToCompleted(Order* ord);
+        void removeVolunteer(Volunteer* vol);
+        
         
         //needs to delete volunteers if they finish
 
