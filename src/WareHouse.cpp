@@ -381,6 +381,5 @@ void WareHouse:: removeVolunteer(Volunteer* vol)
         volunteers.erase(it);
         break;
     }
-    volunteerCounter--;
 }
 }

@@ -45,6 +45,7 @@ class SimulateStep : public BaseAction {
 
     private:
         const int numOfSteps;
+        int totalStepsInProgram; // added by Tomer, calculate total number of steps
 };
 
 class AddOrder : public BaseAction {

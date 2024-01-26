@@ -5,6 +5,7 @@ using namespace std; //Solve the problem of the cout. Or we need to write the be
 
 
 //---BaseAction---------------------------------------------------------------------------------------
+//Add Constructor
 ActionStatus BaseAction:: getStatus() const
 {
     return status;
@@ -30,7 +31,7 @@ string BaseAction:: getErrorMsg() const
 
 void BaseAction:: printErrorMsg() const
  {
-    cout << "Error:" << errorMsg << endl;
+    std::cout << "Error:" << errorMsg << std::endl;
  }
 
 string BaseAction:: status_to_str() const // added by yuval
@@ -46,11 +47,12 @@ string BaseAction:: status_to_str() const // added by yuval
 //---BaseAction------------------------------------------------------------------------------------------
 
 //---Simulate Step---------------------------------------------------------------------------------------
-SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
+SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsInProgram(0) {};
 
  void SimulateStep:: act(WareHouse &wareHouse)
  {
-    for(int i = 0; i <= numOfSteps; i++){
+    for(int i = 1; i <= numOfSteps; i++){
+    
     for(Order* order : wareHouse.getPendingOrders())
     { 
         if(order->getStatus() == OrderStatus::PENDING)
@@ -104,8 +106,21 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {}
     }
 
     complete(); // this action never returns an error
+    totalStepsInProgram++;
+    std::cout << "simulateStep " << i << "COMPLETED" << std::endl; // check if it needs to be here or on the toString method
+    
     }
  }
+
+ string SimulateStep:: toString() const
+ {
+    return "simulateStep" + to_string(totalStepsInProgram) + "COMPLETED"; // not sure about this.
+ }
+
+ SimulateStep *SimulateStep:: clone() const
+{
+    return new SimulateStep(*this);
+}
 
  
 //---SimulateStep---------------------------------------------------------------------------------------
@@ -123,7 +138,7 @@ void AddOrder:: act(WareHouse &wareHouse)
     if (customerId > wareHouse.getCustomerCounter()) 
     {
         error("Cannot place this order. Customer does not exist.");  
-        cout << getErrorMsg() << endl;
+        std::cout << getErrorMsg() << std::endl;
     } else {
 
         Customer &cus = wareHouse.getCustomer(customerId);
@@ -137,7 +152,7 @@ void AddOrder:: act(WareHouse &wareHouse)
             complete();
         } else {
             error("Cannot place this order. Customer has reached its order limit");
-            cout << getErrorMsg() << endl;
+            std::cout << getErrorMsg() << std::endl;
         }
     }
 }
@@ -217,10 +232,10 @@ AddCustomer *AddCustomer:: clone() const
     if (orderId > wareHouse.getOrderCounter()) 
     {
         error("Order doesn't exist.");  
-        cout << getErrorMsg() << endl;
+        std::cout << getErrorMsg() << std::endl;
     } else {
         Order &ord = wareHouse.getOrder(orderId); 
-        cout << ord.toString() << endl; 
+        std::cout << ord.toString() << std::endl; 
         complete();
     }
  }
@@ -250,17 +265,17 @@ void PrintCustomerStatus:: act(WareHouse &wareHouse)
     if (customerId > wareHouse.getCustomerCounter())
     {
         error("Customer doesn't exist.");
-        cout << getErrorMsg() << endl;  
+        std::cout << getErrorMsg() << std::endl;  
     }
     else
     {
         Customer &cus = wareHouse.getCustomer(customerId);
-        cout << "Customer Id: " << to_string(cus.getId()) << endl;
+        std::cout << "Customer Id: " << to_string(cus.getId()) << std::endl;
         for(int orderId : cus.getOrdersIds())
         {
             Order &ord = wareHouse.getOrder(orderId);
-            cout << "OrderID: " << to_string(orderId) << endl;
-            cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << endl;
+            std::cout << "OrderID: " << to_string(orderId) << std::endl;
+            std::cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << std::endl;
         }
         complete();
     }
@@ -290,12 +305,12 @@ string PrintCustomerStatus:: toString() const // check if correct
     if(volunteerId > wareHouse.getVolunteerCounter())
     {
         error("Volunteer doesn't exist.");
-        cout << getErrorMsg() << endl; 
+        std::cout << getErrorMsg() << std::endl; 
     }
     else
     {
         Volunteer &vol = wareHouse.getVolunteer(volunteerId);
-        cout << vol.toString() << endl;
+        std::cout << vol.toString() << std::endl;
         complete();
     }
  }
@@ -321,7 +336,7 @@ void PrintActionsLog:: act(WareHouse &wareHouse)
     wareHouse.addAction(this);
     for(BaseAction* action : wareHouse.getActions())
     {
-        cout<< this->toString() << endl;
+        std::cout<< this->toString() << std::endl;
     }
     complete(); // This action never results in an error.
 }
@@ -413,7 +428,7 @@ RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
     if(backup == nullptr)
     {
         error("backup doesn't exist");
-        cout << getErrorMsg << endl;
+        std::cout << getErrorMsg() << std::endl;
     }
     else
     {
