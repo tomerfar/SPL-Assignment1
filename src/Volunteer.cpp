@@ -42,12 +42,11 @@ CollectorVolunteer *CollectorVolunteer::clone() const
 
 void CollectorVolunteer:: step() 
 {
-    if(decreaseCoolDown())
+    bool isFinish = decreaseCoolDown(); //returns true only if time left == 0
+    if(isFinish)
     {
-      completedOrderId = activeOrderId; //volunteer finished with the order, will be free to accept more orders now
-      activeOrderId = NO_ORDER;
-        // needs to change isBusy status here to false, maybe add a function for it.
-        //check what to do with the limited collector, maybe he can be deleted afterwards
+      completedOrderId = activeOrderId; //volunteer finished with the order
+      activeOrderId = NO_ORDER; // change isBusy status to false, volunteer will be able to accept more orders now
     }
 }
  
@@ -64,12 +63,11 @@ int CollectorVolunteer:: getTimeLeft() const
 
 bool CollectorVolunteer:: decreaseCoolDown() //Decrease timeLeft by 1,return true if timeLeft=0,false otherwise
 {
-    if (timeLeft != 0) 
+    if (timeLeft > 0) 
     {
-        timeLeft = timeLeft - 1;
-        return false;      
+        timeLeft = timeLeft - 1;      
     }
-    return true;
+    return timeLeft == 0;
 }
 
 bool CollectorVolunteer:: hasOrdersLeft() const
@@ -86,7 +84,7 @@ bool CollectorVolunteer:: canTakeOrder(const Order &order) const
 
 void CollectorVolunteer:: acceptOrder(const Order &order)  
 {
-    activeOrderId = order.getId();
+    activeOrderId = order.getId(); // here it also changes the status of isBusy to true
     timeLeft = coolDown;
 
 }     
@@ -236,11 +234,12 @@ void DriverVolunteer:: acceptOrder(const Order &order)
 
 void  DriverVolunteer:: step() // Decrease distanceLeft by distancePerStep
 {
-    if(decreaseDistanceLeft)
+    bool isFinished = decreaseDistanceLeft();
+    if(isFinished)
     {
-        completedOrderId = activeOrderId; //volunteer finished with the order, will be free to accept more orders now
-        activeOrderId = NO_ORDER;
-        // needs to change isBusy status here to false, maybe add a function for it.
+        completedOrderId = activeOrderId; //volunteer finished with the order
+        activeOrderId = NO_ORDER; // change isBusy status back to false, will be free to accept more orders now
+        
     }
 }
 

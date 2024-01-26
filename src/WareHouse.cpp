@@ -25,9 +25,9 @@ WareHouse::~WareHouse()
 void WareHouse:: clearData()
 {
      for (const Order* ord : pendingOrders)
-         { //Deletes all the pending orders
+        { //Deletes all the pending orders
           delete ord;
-         }
+        }
         for (const Order* ord : inProcessOrders)
         { //Deletes all the in prccess orders
          delete ord;
@@ -65,10 +65,10 @@ WareHouse:: WareHouse(const WareHouse& other): isOpen(isOpen),
  volunteerCounter(other.volunteerCounter)
  {
     for (const Order* otherOrder : other.pendingOrders)
-         { //Perform a deep copy of the pending orders
+        { //Perform a deep copy of the pending orders
             Order* newOrder = new Order(*otherOrder);
             pendingOrders.push_back(newOrder);
-         }
+        }
         for (const Order* otherOrder : other.inProcessOrders)
         { //Perform a deep copy of the in proccess orders
             Order* newOrder = new Order(*otherOrder);
@@ -106,10 +106,10 @@ WareHouse& WareHouse::operator=(const WareHouse& other)
         this->volunteerCounter = other.volunteerCounter;
 
         for (const Order* otherOrder : other.pendingOrders)
-         { //Perform a deep copy of the pending orders
+        { //Perform a deep copy of the pending orders
             Order* newOrder = new Order(*otherOrder);
             pendingOrders.push_back(newOrder);
-         }
+        }
         for (const Order* otherOrder : other.inProcessOrders)
         { //Perform a deep copy of the in proccess orders
             Order* newOrder = new Order(*otherOrder);
@@ -372,4 +372,15 @@ void WareHouse:: transferToCompleted(Order* ord)
             break;
         }
     }
+}
+
+void WareHouse:: removeVolunteer(Volunteer* vol)
+{
+    for (auto it = volunteers.begin(); it != volunteers.end(); ++it) {
+    if (*it == vol) {
+        volunteers.erase(it);
+        break;
+    }
+    volunteerCounter--;
+}
 }
