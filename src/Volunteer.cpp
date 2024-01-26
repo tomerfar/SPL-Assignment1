@@ -42,8 +42,8 @@ CollectorVolunteer *CollectorVolunteer::clone() const
 
 void CollectorVolunteer:: step() 
 {
-    bool isFinish = decreaseCoolDown(); //returns true only if time left == 0
-    if(isFinish)
+    bool isFinished = decreaseCoolDown(); // true only if time left == 0
+    if(isFinished)
     {
       completedOrderId = activeOrderId; //volunteer finished with the order
       activeOrderId = NO_ORDER; // change isBusy status to false, volunteer will be able to accept more orders now
@@ -86,6 +86,7 @@ void CollectorVolunteer:: acceptOrder(const Order &order)
 {
     activeOrderId = order.getId(); // here it also changes the status of isBusy to true
     timeLeft = coolDown;
+    completedOrderId = NO_ORDER;
 
 }     
 
@@ -228,7 +229,9 @@ void DriverVolunteer:: acceptOrder(const Order &order)
 {
     
     activeOrderId = order.getId();
-     distanceLeft = order.getDistance();
+    distanceLeft = order.getDistance();
+    completedOrderId = NO_ORDER;
+
 }
 
 

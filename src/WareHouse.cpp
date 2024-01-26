@@ -335,12 +335,12 @@ vector<Customer*> WareHouse:: getCustomers()
 }
   //---getters----------------------------------------------------------------------------
 
-void WareHouse:: transferToInProcess(Order* ord)
+void WareHouse:: transferToInProcess(Order* ord) // go over function, understand pointers 
 {
     inProcessOrders.push_back(ord);
     for (auto it = getPendingOrders().begin(); it != getPendingOrders().end(); ++it) //Finds the order we want to delete and erase it
     {
-        if(*it= ord)
+        if(*it == ord)
         {
             getPendingOrders().erase(it);
             break;
@@ -353,7 +353,7 @@ void WareHouse:: transferToPending(Order* ord)
     pendingOrders.push_back(ord);
     for (auto it = getInProcessOrders().begin(); it != getInProcessOrders().end(); ++it) //Finds the order we want to delete and erase it
     {
-        if(*it= ord)
+        if(*it == ord)
         {
             getInProcessOrders().erase(it);
             break;
@@ -366,7 +366,7 @@ void WareHouse:: transferToCompleted(Order* ord)
     completedOrders.push_back(ord);
     for (auto it = getCompletedOrders().begin(); it != getInProcessOrders().end(); ++it) //Finds the order we want to delete and erase it
     {
-        if(*it= ord)
+        if(*it == ord)
         {
             getInProcessOrders().erase(it);
             break;
@@ -377,9 +377,9 @@ void WareHouse:: transferToCompleted(Order* ord)
 void WareHouse:: removeVolunteer(Volunteer* vol)
 {
     for (auto it = volunteers.begin(); it != volunteers.end(); ++it) {
-    if (*it == vol) {
-        volunteers.erase(it);
-        break;
+        if (*it == vol) {
+            volunteers.erase(it);
+            break;
+        }
     }
-}
 }

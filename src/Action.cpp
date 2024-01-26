@@ -6,6 +6,7 @@ using namespace std; //Solve the problem of the cout. Or we need to write the be
 
 //---BaseAction---------------------------------------------------------------------------------------
 //Add Constructor
+
 ActionStatus BaseAction:: getStatus() const
 {
     return status;
@@ -51,73 +52,70 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
 
  void SimulateStep:: act(WareHouse &wareHouse)
  {
-    for(int i = 1; i <= numOfSteps; i++){
-    
-    for(Order* order : wareHouse.getPendingOrders())
-    { 
-        if(order->getStatus() == OrderStatus::PENDING)
-        {
-            for(Volunteer* vol : wareHouse.getVolunteers())
+    wareHouse.addAction(this);
+    for(int i = 1; i <= numOfSteps; i++)
+    {
+        for(Order* order : wareHouse.getPendingOrders()) // find orders to transfer to inProcess
+        { 
+            if(order->getStatus() == OrderStatus::PENDING) // if pending
             {
-                if(vol->canTakeOrder(*order))
+                for(Volunteer* vol : wareHouse.getVolunteers()) // find volunteer that can take order
                 {
-                    vol->acceptOrder(*order);
-                    order->setCollectorId(vol->getId());
-                    order->setStatus(OrderStatus::COLLECTING);
-                    wareHouse.transferToInProcess(order);
+                    if(vol->canTakeOrder(*order)) // if found
+                    {
+                        vol->acceptOrder(*order);
+                        order->setCollectorId(vol->getId());
+                        order->setStatus(OrderStatus::COLLECTING);
+                        wareHouse.transferToInProcess(order);
+                    }
+                }
+            } else { // if collecting 
+                for(Volunteer* vol : wareHouse.getVolunteers())
+                {
+                    if(vol->canTakeOrder(*order))
+                    {
+                        vol->acceptOrder(*order);
+                        order->setDriverId(vol->getId());
+                        order->setStatus(OrderStatus::DELIVERING);
+                        wareHouse.transferToInProcess(order);
+                    }
                 }
             }
-        } else { // if Collecting 
-            for(Volunteer* vol : wareHouse.getVolunteers())
-            {
-                if(vol->canTakeOrder(*order))
-                {
-                    vol->acceptOrder(*order);
-                    order->setDriverId(vol->getId());
-                    order->setStatus(OrderStatus::DELIVERING);
-                    wareHouse.transferToInProcess(order);
-                }
-            }
-        }
-    } //Step 1 finished
-    for(Volunteer* vol : wareHouse.getVolunteers())
-    {
-        vol->step(); // Step 2 finished
-    }
-    for(Volunteer* vol : wareHouse.getVolunteers())
-    {
-        if(vol->getCompletedOrderId() != NO_ORDER) // means he finished with the order
+        } //Step 1 finished
+        for(Volunteer* vol : wareHouse.getVolunteers()) // performs a "step" for each volunteer
         {
-            Order& completedOrder = wareHouse.getOrder(vol->getCompletedOrderId());
-            if(completedOrder.getStatus() == OrderStatus::COLLECTING)
-            {
-                wareHouse.transferToPending(&completedOrder);
-            }
-            else // order status is delivering.
-            {
-                wareHouse.transferToCompleted(&completedOrder);
-            }
-         if(!vol->hasOrdersLeft() && vol->getCompletedOrderId() != NO_ORDER)
-            {
-                wareHouse.removeVolunteer(vol);
-            }
-            //Step 3 + 4 finished
+            vol->step(); // Step 2 finished
         }
-    }
+        for(Volunteer* vol : wareHouse.getVolunteers()) // check for each vol if they finished their order processing 
+        { 
+            if(vol->getCompletedOrderId() != NO_ORDER) // if finished with order, transfer to pending or completed
+            {
+                Order& completedOrder = wareHouse.getOrder(vol->getCompletedOrderId());
+                if(completedOrder.getStatus() == OrderStatus::COLLECTING) // if collected
+                {
+                    wareHouse.transferToPending(&completedOrder);
+                } else { // if delivered
+                    wareHouse.transferToCompleted(&completedOrder);
+                }
 
+                if(!vol->hasOrdersLeft() && vol->getActiveOrderId() == NO_ORDER) // if reached order limit and not actively processing an order, remove vol
+                {
+                    wareHouse.removeVolunteer(vol);
+                }
+                //Step 3 + 4 finished
+            }
+        }
+        totalStepsInProgram++; // check if we need 
+    }
     complete(); // this action never returns an error
-    totalStepsInProgram++;
-    std::cout << "simulateStep " << i << "COMPLETED" << std::endl; // check if it needs to be here or on the toString method
-    
-    }
  }
 
- string SimulateStep:: toString() const
- {
-    return "simulateStep" + to_string(totalStepsInProgram) + "COMPLETED"; // not sure about this.
- }
+string SimulateStep:: toString() const
+{
+    return "simulateStep " + to_string(totalStepsInProgram) + " " + status_to_str(); // not sure about this.
+}
 
- SimulateStep *SimulateStep:: clone() const
+SimulateStep *SimulateStep:: clone() const
 {
     return new SimulateStep(*this);
 }
@@ -299,8 +297,8 @@ string PrintCustomerStatus:: toString() const // check if correct
  BaseAction(), volunteerId(id){};
 
  //Methods
- void PrintVolunteerStatus:: act(WareHouse &wareHouse)
- {
+void PrintVolunteerStatus:: act(WareHouse &wareHouse)
+{
     wareHouse.addAction(this);
     if(volunteerId > wareHouse.getVolunteerCounter())
     {
@@ -313,17 +311,17 @@ string PrintCustomerStatus:: toString() const // check if correct
         std::cout << vol.toString() << std::endl;
         complete();
     }
- }
+}
 
 PrintVolunteerStatus *PrintVolunteerStatus:: clone() const
-  {
+{
     return new PrintVolunteerStatus(*this);
-  }
+}
 
 string PrintVolunteerStatus:: toString() const
-   {
+{
     return "volunteerStatus " + to_string(volunteerId) + " " + status_to_str();
-   }
+}
    
 //---PrintVolunteerStatus-----------------------------------------------------------------------------------
 
@@ -346,7 +344,6 @@ PrintActionsLog *PrintActionsLog:: clone() const
 {
     return new PrintActionsLog(*this);
 }
-
 
 string PrintActionsLog:: toString() const 
 {
@@ -372,7 +369,6 @@ void Close:: act(WareHouse &wareHouse) // add error
     
 }
 
-
 Close *Close:: clone() const
 {
     return new Close(*this);
@@ -392,8 +388,8 @@ string Close:: toString() const
  BackupWareHouse::BackupWareHouse(): BaseAction(){};
 
  //Methods
- void BackupWareHouse:: act(WareHouse &wareHouse) 
- {
+void BackupWareHouse:: act(WareHouse &wareHouse) 
+{
     wareHouse.addAction(this);
     if(backup == nullptr) //check to see if the address is empty, meaning backup isnt pointing to anything yet
     {
@@ -403,18 +399,18 @@ string Close:: toString() const
     {
         *backup = wareHouse;  // Activate the copy assigment operator
     }
-   complete(); // This action never results in an error.
- }
+    complete(); // This action never results in an error.
+}
 
- BackupWareHouse *BackupWareHouse:: clone() const
- {
+BackupWareHouse *BackupWareHouse:: clone() const
+{
     return new BackupWareHouse(*this);
- }
+}
 
-  string BackupWareHouse:: toString() const
-  {
+string BackupWareHouse:: toString() const
+{
     return "backupWareHouse COMPLETED";
-  }
+}
 //---BackupWareHouse----------------------------------------------------------------------------------------
 
 
@@ -429,19 +425,17 @@ RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
     {
         error("backup doesn't exist");
         std::cout << getErrorMsg() << std::endl;
-    }
-    else
-    {
-      wareHouse.addAction(this);
-      wareHouse = *backup;
-      complete();
+    } else {
+        wareHouse.addAction(this);
+        wareHouse = *backup;
+        complete();
     }
  }
 
- RestoreWareHouse *RestoreWareHouse:: clone() const
- {
+RestoreWareHouse *RestoreWareHouse:: clone() const
+{
     return new RestoreWareHouse(*this);
- }
+}
 
 string RestoreWareHouse:: toString() const
 {
