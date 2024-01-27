@@ -1,6 +1,7 @@
 #include "WareHouse.h"
 #include "Action.h"
-
+#include <fstream>
+#include <sstream>
 #include <iostream> 
 using namespace std;
 
@@ -10,9 +11,72 @@ WareHouse:: WareHouse(const string &configFilePath):
 isOpen(1), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), 
 customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
-    // parse(configFilePath) implement parser 
+    parse(configFilePath);
     start();
 }
+
+/// add parser method
+
+
+
+// Assume you have already included necessary headers
+
+void WareHouse::parse(const std::string& configFilePath) {
+    std::ifstream configFile(configFilePath);
+
+    if (!configFile.is_open()) {
+        std::cerr << "Error: Could not open the config file." << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(configFile, line)) {
+        std::istringstream iss(line);
+        std::string command;
+        iss >> command;
+
+        if (command == "customer") {
+            // Parse customer information
+            std::string name, type;
+            int distance, maxOrders;
+            iss >> name >> type >> distance >> maxOrders;
+
+            if (type == "soldier") {
+                addCustomer(new SoldierCustomer(customerCounter++, name, distance, maxOrders));
+            } else if (type == "civilian") {
+                addCustomer(new CivilianCustomer(customerCounter++, name, distance, maxOrders));
+            } else {
+                std::cerr << "Error: Unknown customer type - " << type << std::endl;
+            }
+        } else if (command == "volunteer") {
+            // Parse volunteer information
+            std::string name, role;
+            int cooldown, maxDistance, distancePerStep, maxOrders = -1;
+            iss >> name >> role >> cooldown;
+
+            if (role == "collector") {
+                addVolunteer(new CollectorVolunteer(volunteerCounter++, name, cooldown));
+            } else if (role == "limited_collector") {
+                iss >> maxOrders;
+                addVolunteer(new LimitedCollectorVolunteer(volunteerCounter++, name, cooldown, maxOrders));
+            } else if (role == "driver") {
+                iss >> maxDistance >> distancePerStep;
+                addVolunteer(new DriverVolunteer(volunteerCounter++, name, maxDistance, distancePerStep));
+            } else if (role == "limited_driver") {
+                iss >> maxDistance >> distancePerStep >> maxOrders;
+                addVolunteer(new LimitedDriverVolunteer(volunteerCounter++, name, maxDistance, distancePerStep, maxOrders));
+            } else {
+                std::cerr << "Error: Unknown volunteer role - " << role << std::endl;
+            }
+        } else {
+            std::cerr << "Error: Unknown command - " << command << std::endl;
+        }
+    }
+
+    configFile.close();
+}
+
+
 
 //Destructor
 WareHouse::~WareHouse()
@@ -200,6 +264,11 @@ void WareHouse:: addOrder(Order* order)
     customerCounter++;
     customers.push_back(customer);
  }
+
+void WareHouse::addVolunteer(Volunteer* volunteer) {
+    volunteerCounter++;
+    volunteers.push_back(volunteer);
+}
 
  void WareHouse:: addAction(BaseAction* action)
  {

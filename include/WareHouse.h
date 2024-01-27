@@ -16,6 +16,7 @@ class WareHouse {
 
     public:
         WareHouse(const string &configFilePath);
+        void parse(const std::string& configFilePath); // parser
         ~WareHouse(); //Destructor
         WareHouse(const WareHouse& other); // Copy Constructor
         WareHouse& operator=(const WareHouse& other); //Copy Assignment Operator
@@ -26,7 +27,8 @@ class WareHouse {
         void start();
         void addOrder(Order* order);
         void addAction(BaseAction* action);
-        void addCustomer(Customer* customer); // Added myself
+        void addCustomer(Customer* customer); 
+        void addVolunteer(Volunteer* Volunteer);
         Customer &getCustomer(int customerId) const;
         Volunteer &getVolunteer(int volunteerId) const;
         Order &getOrder(int orderId) const;
