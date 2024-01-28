@@ -8,7 +8,7 @@ using namespace std;
 
 //Constructor
 WareHouse:: WareHouse(const string &configFilePath):
-isOpen(1), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), 
+isOpen(false), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), 
 customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
     parse(configFilePath);
@@ -248,8 +248,75 @@ WareHouse& WareHouse::operator=(WareHouse&& other) noexcept
 
 void WareHouse:: start()
 {
-cout << "Warehouse is open!" << endl;
-open();
+    open();
+    cout << "Warehouse is open!" << endl;
+    string input; 
+    while (isOpen) {
+        cout << "Enter command: ";
+        getline(cin, input); 
+        if (!input.empty()) {
+            std::istringstream iss(input); 
+            string action;
+            iss >> action;
+            
+            if (action == "order") {
+                int customerId;
+                iss >> customerId;
+                AddOrder* addOrder = new AddOrder(customerId);
+                addOrder->act(*this);
+            }
+            else if (action == "orderStatus") {
+                int orderId;
+                iss >> orderId;
+                PrintOrderStatus* printOrderStatus = new PrintOrderStatus(orderId);
+                printOrderStatus->act(*this);
+            }
+            else if (action == "customerStatus") {
+                int customerId;
+                iss >> customerId;
+                PrintCustomerStatus* printCustomerStatus = new PrintCustomerStatus(customerId);
+                printCustomerStatus->act(*this);
+            }
+            else if (action == "volunteerStatus") {
+                int volunteerId;
+                iss >> volunteerId;
+                PrintVolunteerStatus* printVolunteerStatus = new PrintVolunteerStatus(volunteerId);
+                printVolunteerStatus->act(*this);
+            }
+            else if (action == "addCustomer") {
+                string name, customerType;
+                int locationDistance, maxOrders;
+                iss >> name >> customerType >> locationDistance >> maxOrders;
+                AddCustomer* addCustomer = new AddCustomer(name, customerType, locationDistance, maxOrders);
+                addCustomer->act(*this);
+            }
+            else if (action == "step") {
+                int numOfSteps;
+                iss >> numOfSteps;
+                SimulateStep* simulateStep = new SimulateStep(numOfSteps);
+                simulateStep->act(*this);
+            }
+            else if (action == "close") {
+                Close* close = new Close();
+                close->act(*this);
+            }
+            else if (action == "log") {
+                PrintActionsLog* printActionsLog = new PrintActionsLog();
+                printActionsLog->act(*this);
+            }
+           else if (action == "restore") {
+               RestoreWareHouse* restoreWareHouse = new RestoreWareHouse();
+               restoreWareHouse->act(*this);
+           }
+           else if (action == "backup") {
+               BackupWareHouse* backupWareHouse = new BackupWareHouse();
+               backupWareHouse->act(*this);
+           }
+        }
+        else {
+            cout << "Invalid input" << endl;
+        }
+    }
 }
 
 void WareHouse:: addOrder(Order* order)
