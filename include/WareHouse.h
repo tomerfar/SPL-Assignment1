@@ -1,7 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
-
+#include <fstream>
+#include <sstream>
+#include <iostream> 
+#include "Action.h"
 #include "Order.h"
 #include "Customer.h"
 #include "Volunteer.h"
@@ -17,6 +20,7 @@ class WareHouse {
     public:
         WareHouse(const string &configFilePath);
         void parse(const std::string& configFilePath); // parser
+        void parseLine(const std::string& line); // parser helper function 
         ~WareHouse(); //Destructor
         WareHouse(const WareHouse& other); // Copy Constructor
         WareHouse& operator=(const WareHouse& other); //Copy Assignment Operator
