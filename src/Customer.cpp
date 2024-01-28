@@ -1,8 +1,7 @@
-#include "Customer.h"
-#include "Order.h"
-#include "WareHouse.h"
+#include "../include/Customer.h"
+#include "../include/Order.h"
+#include "../include/WareHouse.h"
 #include <iostream>
-
 //Constructor
  Customer :: Customer(int id, const string &name, int locationDistance, int maxOrders):
  id(id), name(name), locationDistance(locationDistance), maxOrders(maxOrders) {

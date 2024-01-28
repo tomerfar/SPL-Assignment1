@@ -1,5 +1,11 @@
-#include "WareHouse.h"
+#include "../include/WareHouse.h"
+#include "../include/Action.h"
+#include "../include/Order.h"
+#include "../include/Volunteer.h"
 
+#include <fstream>
+#include <sstream>
+#include <iostream> 
 using namespace std;
 
 

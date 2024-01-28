@@ -1,4 +1,4 @@
-#include "Action.h"
+#include "../include/Action.h"
 #include <iostream> 
 using namespace std; //Solve the problem of the cout. Or we need to write the before our cout std::
 
@@ -6,7 +6,7 @@ using namespace std; //Solve the problem of the cout. Or we need to write the be
 
 //---BaseAction---------------------------------------------------------------------------------------
 //Add Constructor
-
+BaseAction::BaseAction() : errorMsg(""), status(ActionStatus::COMPLETED){} // check what to start status with
 ActionStatus BaseAction:: getStatus() const
 {
     return status;
@@ -326,8 +326,8 @@ string PrintVolunteerStatus:: toString() const
 //---PrintVolunteerStatus-----------------------------------------------------------------------------------
 
 //---PrintActionsLog----------------------------------------------------------------------------------------
-
-//check that we don't need to implement constructot (default given)
+//Constructor
+PrintActionsLog::PrintActionsLog(): BaseAction(){}
 
 void PrintActionsLog:: act(WareHouse &wareHouse) 
 {
@@ -358,8 +358,9 @@ string PrintActionsLog:: toString() const
 //---Close--------------------------------------------------------------------------------------------------
 
 
-//check that we don't need to implement constructot (default given)
 
+//Constructor
+Close::Close(): BaseAction(){}
 void Close:: act(WareHouse &wareHouse) // add error 
 {
     wareHouse.addAction(this);

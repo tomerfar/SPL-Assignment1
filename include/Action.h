@@ -22,7 +22,7 @@ class BaseAction{
         virtual void act(WareHouse& wareHouse)=0;
         virtual string toString() const=0;
         virtual BaseAction* clone() const=0;
-        string status_to_str() const;                         // yuval added
+        string status_to_str() const;                 // yuval added
 
     protected:
         void complete();
