@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream> 
+#include <algorithm>
 using namespace std;
 
 
@@ -22,6 +23,7 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 
 
 //Destructor
+
 WareHouse::~WareHouse()
 {
     clearData();
@@ -191,15 +193,12 @@ void WareHouse:: start()
 {
     open();
     cout << "Warehouse is open!" << endl;
-    string input;
+    string input = "s";
     while (isOpen) {
         if (!input.empty()) {
             cout << "Enter command: ";
             getline(cin, input);
-            std::istringstream iss(input);
-            std::string command;
-            iss >> command;
-            parseLine(command);
+            parseLine(input);
         } else {
             cout << "Invalid input" << endl;
         }
@@ -365,51 +364,47 @@ vector<Customer*> WareHouse:: getCustomers()
 }
   //---getters----------------------------------------------------------------------------
 
-void WareHouse:: transferToInProcess(Order* ord) // go over function, understand pointers 
+
+
+void WareHouse::transferToInProcess(Order* ord)
 {
     inProcessOrders.push_back(ord);
-    for (auto it = getPendingOrders().begin(); it != getPendingOrders().end(); ++it) //Finds the order we want to delete and erase it
-    {
-        if(*it == ord)
-        {
-            getPendingOrders().erase(it);
-            break;
-        }
+
+    auto it = std::find(pendingOrders.begin(), pendingOrders.end(), ord);
+    if (it != pendingOrders.end()) {
+        pendingOrders.erase(it);
     }
 }
 
-void WareHouse:: transferToPending(Order* ord)
+
+
+
+void WareHouse::transferToPending(Order* ord)
 {
     pendingOrders.push_back(ord);
-    for (auto it = getInProcessOrders().begin(); it != getInProcessOrders().end(); ++it) //Finds the order we want to delete and erase it
-    {
-        if(*it == ord)
-        {
-            getInProcessOrders().erase(it);
-            break;
-        }
+
+    auto it = std::find(inProcessOrders.begin(), inProcessOrders.end(), ord);
+    if (it != inProcessOrders.end()) {
+        inProcessOrders.erase(it);
     }
 }
 
-void WareHouse:: transferToCompleted(Order* ord)
+
+void WareHouse::transferToCompleted(Order* ord)
 {
     completedOrders.push_back(ord);
-    for (auto it = getCompletedOrders().begin(); it != getInProcessOrders().end(); ++it) //Finds the order we want to delete and erase it
-    {
-        if(*it == ord)
-        {
-            getInProcessOrders().erase(it);
-            break;
-        }
+
+    auto it = std::find(inProcessOrders.begin(), inProcessOrders.end(), ord);
+    if (it != inProcessOrders.end()) {
+        inProcessOrders.erase(it);
     }
 }
 
-void WareHouse:: removeVolunteer(Volunteer* vol)
+
+void WareHouse::removeVolunteer(Volunteer* vol)
 {
-    for (auto it = volunteers.begin(); it != volunteers.end(); ++it) {
-        if (*it == vol) {
-            volunteers.erase(it);
-            break;
-        }
+    auto it = std::find(volunteers.begin(), volunteers.end(), vol);
+    if (it != volunteers.end()) {
+        volunteers.erase(it);
     }
 }

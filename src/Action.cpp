@@ -49,7 +49,7 @@ string BaseAction:: status_to_str() const // added by yuval
 //---BaseAction------------------------------------------------------------------------------------------
 
 //---Simulate Step---------------------------------------------------------------------------------------
-SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsInProgram(0) {};
+SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {};
 
  void SimulateStep:: act(WareHouse &wareHouse)
  {
@@ -62,7 +62,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
             {
                 for(Volunteer* vol : wareHouse.getVolunteers()) // find volunteer that can take order
                 {
-                    if(vol->canTakeOrder(*order)) // if found
+                    if(vol->canTakeOrder(*order) && vol->isCollector()) // if found
                     {
                         vol->acceptOrder(*order);
                         order->setCollectorId(vol->getId());
@@ -73,7 +73,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
             } else { // if collecting 
                 for(Volunteer* vol : wareHouse.getVolunteers())
                 {
-                    if(vol->canTakeOrder(*order))
+                    if(vol->canTakeOrder(*order) && !(vol->isCollector()))
                     {
                         vol->acceptOrder(*order);
                         order->setDriverId(vol->getId());
@@ -97,6 +97,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
                     wareHouse.transferToPending(&completedOrder);
                 } else { // if delivered
                     wareHouse.transferToCompleted(&completedOrder);
+                    completedOrder.setStatus(OrderStatus::COMPLETED);
                 }
 
                 if(!vol->hasOrdersLeft() && vol->getActiveOrderId() == NO_ORDER) // if reached order limit and not actively processing an order, remove vol
@@ -106,14 +107,13 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
                 //Step 3 + 4 finished
             }
         }
-        totalStepsInProgram++; // check if we need 
     }
     complete(); // this action never returns an error
  }
 
 string SimulateStep:: toString() const
 {
-    return "simulateStep " + to_string(totalStepsInProgram) + " " + status_to_str(); // not sure about this.
+    return "simulateStep " + to_string(numOfSteps) + " " + status_to_str(); // not sure about this.
 }
 
 SimulateStep *SimulateStep:: clone() const
@@ -272,15 +272,17 @@ void PrintCustomerStatus:: act(WareHouse &wareHouse)
     {
         Customer &cus = wareHouse.getCustomer(customerId);
         std::cout << "Customer Id: " << to_string(cus.getId()) << std::endl;
-        for(int orderId : cus.getOrdersIds())
-        {
+            for(int orderId : cus.getOrdersIds())
+           {
             Order &ord = wareHouse.getOrder(orderId);
             std::cout << "OrderID: " << to_string(orderId) << std::endl;
             std::cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << std::endl;
+           }
         }
-        complete();
-    }
+       
+    complete();
 }
+
 
 PrintCustomerStatus *PrintCustomerStatus:: clone() const
 {
