@@ -27,7 +27,7 @@ void BaseAction:: error(string errorMsg)
 
 string BaseAction:: getErrorMsg() const
 {
-    printErrorMsg(); // Call the function that will pring ther error msg to the screen.
+    printErrorMsg(); // Call the function that will print ther error msg to the screen.
     return errorMsg;
 }
 
@@ -49,7 +49,7 @@ string BaseAction:: status_to_str() const // added by yuval
 //---BaseAction------------------------------------------------------------------------------------------
 
 //---Simulate Step---------------------------------------------------------------------------------------
-SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsInProgram(0) {};
+SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {};
 
  void SimulateStep:: act(WareHouse &wareHouse)
  {
@@ -62,7 +62,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
             {
                 for(Volunteer* vol : wareHouse.getVolunteers()) // find volunteer that can take order
                 {
-                    if(vol->canTakeOrder(*order)) // if found
+                    if(vol->canTakeOrder(*order) && vol->isCollector()) // if found
                     {
                         vol->acceptOrder(*order);
                         order->setCollectorId(vol->getId());
@@ -73,7 +73,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
             } else { // if collecting 
                 for(Volunteer* vol : wareHouse.getVolunteers())
                 {
-                    if(vol->canTakeOrder(*order))
+                    if(vol->canTakeOrder(*order) && !(vol->isCollector()))
                     {
                         vol->acceptOrder(*order);
                         order->setDriverId(vol->getId());
@@ -97,6 +97,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
                     wareHouse.transferToPending(&completedOrder);
                 } else { // if delivered
                     wareHouse.transferToCompleted(&completedOrder);
+                    completedOrder.setStatus(OrderStatus::COMPLETED);
                 }
 
                 if(!vol->hasOrdersLeft() && vol->getActiveOrderId() == NO_ORDER) // if reached order limit and not actively processing an order, remove vol
@@ -106,14 +107,13 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps), totalStepsI
                 //Step 3 + 4 finished
             }
         }
-        totalStepsInProgram++; // check if we need 
     }
     complete(); // this action never returns an error
  }
 
 string SimulateStep:: toString() const
 {
-    return "simulateStep " + to_string(totalStepsInProgram) + " " + status_to_str(); // not sure about this.
+    return "simulateStep " + to_string(numOfSteps) + " " + status_to_str();
 }
 
 SimulateStep *SimulateStep:: clone() const
@@ -137,7 +137,7 @@ void AddOrder:: act(WareHouse &wareHouse)
     if (customerId > wareHouse.getCustomerCounter()) 
     {
         error("Cannot place this order. Customer does not exist.");  
-        std::cout << getErrorMsg() << std::endl;
+        getErrorMsg();
     } else {
 
         Customer &cus = wareHouse.getCustomer(customerId);
@@ -151,14 +151,14 @@ void AddOrder:: act(WareHouse &wareHouse)
             complete();
         } else {
             error("Cannot place this order. Customer has reached its order limit");
-            std::cout << getErrorMsg() << std::endl;
+            getErrorMsg();
         }
     }
 }
 
 string AddOrder:: toString() const 
 {
-    return "order " + to_string(orderId) + " " + status_to_str(); 
+    return "order " + to_string(customerId) + " " + status_to_str(); 
 }
 
 AddOrder *AddOrder:: clone() const
@@ -233,7 +233,7 @@ AddCustomer *AddCustomer:: clone() const
     if (orderId > wareHouse.getOrderCounter()) 
     {
         error("Order doesn't exist.");  
-        std::cout << getErrorMsg() << std::endl;
+        getErrorMsg();
     } else {
         Order &ord = wareHouse.getOrder(orderId); 
         std::cout << ord.toString() << std::endl; 
@@ -266,21 +266,24 @@ void PrintCustomerStatus:: act(WareHouse &wareHouse)
     if (customerId > wareHouse.getCustomerCounter())
     {
         error("Customer doesn't exist.");
-        std::cout << getErrorMsg() << std::endl;  
+        getErrorMsg();  
     }
     else
     {
         Customer &cus = wareHouse.getCustomer(customerId);
         std::cout << "Customer Id: " << to_string(cus.getId()) << std::endl;
-        for(int orderId : cus.getOrdersIds())
-        {
+            for(int orderId : cus.getOrdersIds())
+           {
             Order &ord = wareHouse.getOrder(orderId);
             std::cout << "OrderID: " << to_string(orderId) << std::endl;
             std::cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << std::endl;
+           }
+           std::cout << "numOrdersLeft: " << to_string(cus.getMaxOrders() - cus.getNumOrders()) << std::endl;
         }
-        complete();
-    }
+       
+    complete();
 }
+
 
 PrintCustomerStatus *PrintCustomerStatus:: clone() const
 {
@@ -306,7 +309,7 @@ void PrintVolunteerStatus:: act(WareHouse &wareHouse)
     if(volunteerId > wareHouse.getVolunteerCounter())
     {
         error("Volunteer doesn't exist.");
-        std::cout << getErrorMsg() << std::endl; 
+        getErrorMsg(); 
     }
     else
     {
@@ -334,11 +337,11 @@ PrintActionsLog::PrintActionsLog(): BaseAction(){}
 
 void PrintActionsLog:: act(WareHouse &wareHouse) 
 {
-    wareHouse.addAction(this);
     for(BaseAction* action : wareHouse.getActions())
     {
         std::cout<< action->toString() << std::endl;
     }
+    wareHouse.addAction(this);
     complete(); // This action never results in an error.
 }
 
@@ -350,7 +353,7 @@ PrintActionsLog *PrintActionsLog:: clone() const
 
 string PrintActionsLog:: toString() const 
 {
-    return "printActionsLog "  + status_to_str();
+    return "log "  + status_to_str();
 }
 
 
@@ -428,7 +431,7 @@ RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
     if(backup == nullptr)
     {
         error("backup doesn't exist");
-        std::cout << getErrorMsg() << std::endl;
+        getErrorMsg();
     } else {
         wareHouse.addAction(this);
         wareHouse = *backup;

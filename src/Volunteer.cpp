@@ -100,13 +100,18 @@ string CollectorVolunteer:: toString() const
 
     return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + to_string(isBusy()) + 
+    + "isBusy: " + (isBusy() ? "true" : "false") + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
     + "timeLeft: " + to_string(getTimeLeft()) + 
     "\n"
     + "ordersLeft: No Limit";
+}
+
+bool CollectorVolunteer:: isCollector()
+{
+    return true;
 }
 
 
@@ -160,7 +165,7 @@ string LimitedCollectorVolunteer::toString() const
 
     return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + to_string(isBusy()) + 
+    + "isBusy: " + (isBusy() ? "true" : "false") + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
@@ -168,6 +173,11 @@ string LimitedCollectorVolunteer::toString() const
     "\n"
     + "ordersLeft: " + to_string(getNumOrdersLeft());
 }
+
+// bool LimitedCollectorVolunteer:: isCollector()
+// {
+//     return true;
+// }
   
 
   
@@ -257,13 +267,18 @@ string DriverVolunteer:: toString() const
 
     return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + to_string(isBusy()) + 
+    + "isBusy: " + (isBusy() ? "true" : "false") + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
     + "distanceLeft: " + to_string(getDistanceLeft()) + 
     "\n"
     + "ordersLeft: No Limit";
+}
+
+bool DriverVolunteer:: isCollector()
+{
+    return false;
 }
 
 
@@ -315,7 +330,7 @@ bool LimitedDriverVolunteer:: canTakeOrder(const Order &order) const
     }
     return "VolunteerID: " + to_string(getId()) + 
     "\n"
-    + "isBusy: " + to_string(isBusy()) + 
+    + "isBusy: " + (isBusy() ? "true" : "false") + 
     "\n"
     + "OrderID: " + str_orderID + 
     "\n"
@@ -323,6 +338,11 @@ bool LimitedDriverVolunteer:: canTakeOrder(const Order &order) const
     "\n"
     + "ordersLeft: " + to_string(getNumOrdersLeft());
  }
+
+//  bool LimitedDriverVolunteer:: isCollector()
+//  {
+//     return false;
+//  }
 
 
 

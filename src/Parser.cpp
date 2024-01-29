@@ -22,35 +22,34 @@ void WareHouse::parse(const std::string& configFilePath) {
             iss >> name >> type >> distance >> maxOrders;
 
             if (type == "soldier") {
-                addCustomer(new SoldierCustomer(customerCounter++, name, distance, maxOrders));
+                addCustomer(new SoldierCustomer(getCustomerCounter(), name, distance, maxOrders));
             } else if (type == "civilian") {
-                addCustomer(new CivilianCustomer(customerCounter++, name, distance, maxOrders));
+                addCustomer(new CivilianCustomer(getCustomerCounter(), name, distance, maxOrders));
             } else {
                 std::cerr << "Error: Unknown customer type - " << type << std::endl;
             }
         } else if (command == "volunteer") {
             // Parse volunteer information
             std::string name, role;
-            int cooldown, maxDistance, distancePerStep, maxOrders = -1;
-            iss >> name >> role >> cooldown;
-
+            int cooldown, maxDistance, distancePerStep, maxOrders;
+            iss >> name >> role;
+            
             if (role == "collector") {
-                addVolunteer(new CollectorVolunteer(volunteerCounter++, name, cooldown));
+                iss >> cooldown;
+                addVolunteer(new CollectorVolunteer(getVolunteerCounter(), name, cooldown));
             } else if (role == "limited_collector") {
-                iss >> maxOrders;
-                addVolunteer(new LimitedCollectorVolunteer(volunteerCounter++, name, cooldown, maxOrders));
+                iss >> cooldown >> maxOrders;
+                addVolunteer(new LimitedCollectorVolunteer(getVolunteerCounter(), name, cooldown, maxOrders));
             } else if (role == "driver") {
                 iss >> maxDistance >> distancePerStep;
-                addVolunteer(new DriverVolunteer(volunteerCounter++, name, maxDistance, distancePerStep));
+                addVolunteer(new DriverVolunteer(getVolunteerCounter(), name, maxDistance, distancePerStep));
             } else if (role == "limited_driver") {
                 iss >> maxDistance >> distancePerStep >> maxOrders;
-                addVolunteer(new LimitedDriverVolunteer(volunteerCounter++, name, maxDistance, distancePerStep, maxOrders));
+                addVolunteer(new LimitedDriverVolunteer(getVolunteerCounter(), name, maxDistance, distancePerStep, maxOrders));
             } else {
                 std::cerr << "Error: Unknown volunteer role - " << role << std::endl;
             }
-        } else {
-            std::cerr << "Error: Unknown command - " << command << std::endl;
-        }
+        } 
     }
     configFile.close();
 }
