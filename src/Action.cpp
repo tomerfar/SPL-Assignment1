@@ -426,7 +426,7 @@ string BackupWareHouse:: toString() const
 RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
 
 //Methods
- void RestoreWareHouse:: act(WareHouse &wareHouse) // add error
+ void RestoreWareHouse:: act(WareHouse &wareHouse) 
  {
     if(backup == nullptr)
     {
