@@ -1,4 +1,8 @@
 #include "../include/WareHouse.h"
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 
 using namespace std;

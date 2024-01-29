@@ -2,7 +2,7 @@
 using namespace std;
 
 //Constructor
-Volunteer::Volunteer(int id, const string &name) : id(id), name(name), activeOrderId(NO_ORDER), completedOrderId(NO_ORDER) {}
+Volunteer::Volunteer(int id, const string &name) : completedOrderId(NO_ORDER),  activeOrderId(NO_ORDER), id(id), name(name) {}
 
  
 //Volunteer Methods

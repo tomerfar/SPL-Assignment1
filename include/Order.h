@@ -18,6 +18,7 @@ class Order {
 
     public:
         Order(int id, int customerId, int distance);
+        ~Order() = default;
         int getId() const;
         int getCustomerId() const;
         int getDistance() const;

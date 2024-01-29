@@ -10,6 +10,7 @@ using std::vector;
 class Volunteer {
     public:
         Volunteer(int id, const string &name);
+        virtual ~Volunteer() = default;
         int getId() const;
         const string &getName() const;
         int getActiveOrderId() const;
@@ -39,6 +40,7 @@ class CollectorVolunteer: public Volunteer {
 
     public:
         CollectorVolunteer(int id, const string &name, int coolDown);
+        ~CollectorVolunteer() = default;
         CollectorVolunteer *clone() const override;
         void step() override;
         int getCoolDown() const;
@@ -58,6 +60,7 @@ class LimitedCollectorVolunteer: public CollectorVolunteer {
 
     public:
         LimitedCollectorVolunteer(int id, const string &name, int coolDown ,int maxOrders);
+        ~LimitedCollectorVolunteer() = default;
         LimitedCollectorVolunteer *clone() const override;
         bool hasOrdersLeft() const override;
         bool canTakeOrder(const Order &order) const override;
@@ -76,6 +79,7 @@ class DriverVolunteer: public Volunteer {
 
     public:
         DriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep);
+        ~DriverVolunteer() = default;
         DriverVolunteer *clone() const override;
 
         int getDistanceLeft() const;
@@ -98,6 +102,7 @@ class LimitedDriverVolunteer: public DriverVolunteer {
 
     public:
         LimitedDriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep,int maxOrders);
+        ~LimitedDriverVolunteer() = default;
         LimitedDriverVolunteer *clone() const override;
         int getMaxOrders() const;
         int getNumOrdersLeft() const;

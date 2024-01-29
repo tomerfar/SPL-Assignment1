@@ -4,16 +4,14 @@
 #include <fstream>
 #include <sstream>
 #include <iostream> 
-#include "Action.h"
-#include "Order.h"
-#include "Customer.h"
-#include "Volunteer.h"
+#include "../include/Order.h"
+#include "../include/Volunteer.h"
+#include "../include/Customer.h"
 
 class BaseAction;
 class Volunteer;
 
 // Warehouse responsible for Volunteers, Customers Actions, and Orders.
-extern WareHouse* backup; // Check to see it needed to instantiated here!!!!
 
 class WareHouse {
 
@@ -54,8 +52,6 @@ class WareHouse {
         void transferToCompleted(Order* ord);
         void removeVolunteer(Volunteer* vol);
         
-        
-        //needs to delete volunteers if they finish
 
 
     private:
@@ -69,8 +65,5 @@ class WareHouse {
         int customerCounter; //For assigning unique customer IDs
         int volunteerCounter; //For assigning unique volunteer IDs
         int orderCounter; //For assigning unique order IDs
-
-        vector<CollectorVolunteer*> availableCollectors;
-        vector<DriverVolunteer*> availableDrivers;
 
 };

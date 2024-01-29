@@ -1,7 +1,5 @@
 #include "../include/WareHouse.h"
 #include "../include/Action.h"
-#include "../include/Order.h"
-#include "../include/Volunteer.h"
 
 #include <fstream>
 #include <sstream>
@@ -68,10 +66,13 @@ void WareHouse:: clearData()
 //clearData
 
 //CopyConstructor
-WareHouse:: WareHouse(const WareHouse& other): isOpen(isOpen),
- orderCounter(other.orderCounter),
+WareHouse:: WareHouse(const WareHouse& other): isOpen(other.isOpen),
+ actionsLog(other.actionsLog), volunteers(other.volunteers),
+ pendingOrders(other.pendingOrders), inProcessOrders(other.inProcessOrders),
+ completedOrders(other.completedOrders), customers(other.customers),
  customerCounter(other.customerCounter),
- volunteerCounter(other.volunteerCounter)
+ volunteerCounter(other.volunteerCounter),
+ orderCounter(other.orderCounter)
  {
     for (const Order* otherOrder : other.pendingOrders)
         { //Perform a deep copy of the pending orders
@@ -141,21 +142,19 @@ WareHouse& WareHouse::operator=(const WareHouse& other)
         { // Use the clone method of each derived baseAction class to copy the actions
             actionsLog.push_back(otherAction->clone());
         }
-
+    }
     return *this;
-}
 }
 //CopyAssignmentOperator
 
 //Move Constructor
 WareHouse::WareHouse(WareHouse&& other) noexcept:
-orderCounter(other.orderCounter), customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter),
-pendingOrders(move(other.pendingOrders)),
-inProcessOrders(move(other.inProcessOrders)),
-completedOrders(move(other.completedOrders)),
-customers(move(other.customers)),
-volunteers(move(other.volunteers)),
-actionsLog(move(other.actionsLog))
+isOpen(move(other.isOpen)), actionsLog(move(other.actionsLog)), volunteers(move(other.volunteers)),
+ pendingOrders(move(other.pendingOrders)), inProcessOrders(move(other.inProcessOrders)),
+ completedOrders(move(other.completedOrders)), customers(move(other.customers)),
+ customerCounter(other.customerCounter),
+ volunteerCounter(other.volunteerCounter),
+ orderCounter(other.orderCounter)
 {
     //check what to do with the counter fields, they arent pointers so we cant set them do be nullptr
    other.pendingOrders.clear();
@@ -173,23 +172,20 @@ WareHouse& WareHouse::operator=(WareHouse&& other) noexcept
   if(this != &other)
   {
     clearData();
-    orderCounter = other.orderCounter;
-    customerCounter = other.customerCounter;
-    volunteerCounter = other.volunteerCounter;
+    actionsLog = move(other.actionsLog);
+    volunteers = move(other.volunteers);
     pendingOrders = move(other.pendingOrders);
     inProcessOrders = move(other.inProcessOrders);
     completedOrders = move(other.completedOrders);
     customers = move(other.customers);
-    volunteers = move(other.volunteers);
-    actionsLog = move(other.actionsLog);
+    customerCounter = other.customerCounter;
+    volunteerCounter = other.volunteerCounter;
+    orderCounter = other.orderCounter;
 
   }
   return *this;
 }
-
 //Move Assignment Operator
-
-
 
 void WareHouse:: start()
 {
@@ -209,6 +205,11 @@ void WareHouse:: start()
         }
     }
 }
+
+CollectorVolunteer* defaultVol = new CollectorVolunteer(-1, "default", -1);
+Order* defaultOrd = new Order(-1, -1, -1);
+CivilianCustomer* defaultCus = new CivilianCustomer(-1, "default", -1, -1);
+
 
 void WareHouse:: addOrder(Order* order)
 {
@@ -243,11 +244,12 @@ Customer &WareHouse:: getCustomer(int customerId) const
           return *cus;  
         }
     }
+    return *defaultCus;
 }
 
 Volunteer &WareHouse:: getVolunteer(int volunteerId) const
 {
-     // need to ask whether we can get a non exitsing vol
+
     for(Volunteer* vol : volunteers) 
     {
         if(vol->getId() == volunteerId)
@@ -255,6 +257,7 @@ Volunteer &WareHouse:: getVolunteer(int volunteerId) const
             return *vol;
         }
     }
+    return *defaultVol;
 
 }
 
@@ -282,7 +285,7 @@ Order &WareHouse:: getOrder (int orderId) const
             return *ord;
         }
     } 
-    
+    return *defaultOrd;
 }
 
 const vector<BaseAction*> &WareHouse:: getActions() const

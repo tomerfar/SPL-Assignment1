@@ -1,10 +1,11 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "WareHouse.h"
+#include "../include/WareHouse.h"
+extern WareHouse* backup;
 using std::string;
 using std::vector;
-extern WareHouse* backup;
+
 
 enum class ActionStatus{
     COMPLETED, ERROR
@@ -18,6 +19,7 @@ enum class CustomerType{
 class BaseAction{
     public:
         BaseAction(); // check if we need to implement default constructor 
+        virtual ~BaseAction() = default;
         ActionStatus getStatus() const;
         virtual void act(WareHouse& wareHouse)=0;
         virtual string toString() const=0;
@@ -39,6 +41,7 @@ class SimulateStep : public BaseAction {
 
     public:
         SimulateStep(int numOfSteps);
+        ~SimulateStep() override = default;
         void act(WareHouse &wareHouse) override;
         std::string toString() const override;
         SimulateStep *clone() const override;
@@ -51,6 +54,7 @@ class SimulateStep : public BaseAction {
 class AddOrder : public BaseAction {
     public:
         AddOrder(int id);
+        ~AddOrder() override = default;
         void act(WareHouse &wareHouse) override;
         string toString() const override;
         AddOrder *clone() const override;
@@ -63,6 +67,7 @@ class AddOrder : public BaseAction {
 class AddCustomer : public BaseAction {
     public:
         AddCustomer(string customerName, string customerType, int distance, int maxOrders);
+        ~AddCustomer() override = default;
         void act(WareHouse &wareHouse) override;
         AddCustomer *clone() const override;
         string toString() const override;
@@ -79,6 +84,7 @@ class AddCustomer : public BaseAction {
 class PrintOrderStatus : public BaseAction {
     public:
         PrintOrderStatus(int id);
+        ~PrintOrderStatus() override = default;
         void act(WareHouse &wareHouse) override;
         PrintOrderStatus *clone() const override;
         string toString() const override;
@@ -89,6 +95,7 @@ class PrintOrderStatus : public BaseAction {
 class PrintCustomerStatus: public BaseAction {
     public:
         PrintCustomerStatus(int customerId);
+        ~PrintCustomerStatus() override = default;
         void act(WareHouse &wareHouse) override;
         PrintCustomerStatus *clone() const override;
         string toString() const override;
@@ -100,6 +107,7 @@ class PrintCustomerStatus: public BaseAction {
 class PrintVolunteerStatus : public BaseAction {
     public:
         PrintVolunteerStatus(int id);
+        ~PrintVolunteerStatus() override = default;
         void act(WareHouse &wareHouse) override;
         PrintVolunteerStatus *clone() const override;
         string toString() const override;
@@ -111,6 +119,7 @@ class PrintVolunteerStatus : public BaseAction {
 class PrintActionsLog : public BaseAction {
     public:
         PrintActionsLog();
+        ~PrintActionsLog() override = default;
         void act(WareHouse &wareHouse) override;
         PrintActionsLog *clone() const override;
         string toString() const override;
@@ -120,6 +129,7 @@ class PrintActionsLog : public BaseAction {
 class Close : public BaseAction {
     public:
         Close();
+        ~Close() override = default;
         void act(WareHouse &wareHouse) override;
         Close *clone() const override;
         string toString() const override;
@@ -129,6 +139,7 @@ class Close : public BaseAction {
 class BackupWareHouse : public BaseAction {
     public:
         BackupWareHouse();
+        ~BackupWareHouse() override = default;
         void act(WareHouse &wareHouse) override;
         BackupWareHouse *clone() const override;
         string toString() const override;
@@ -139,6 +150,7 @@ class BackupWareHouse : public BaseAction {
 class RestoreWareHouse : public BaseAction {
     public:
         RestoreWareHouse();
+        ~RestoreWareHouse() override = default;
         void act(WareHouse &wareHouse) override;
         RestoreWareHouse *clone() const override;
         string toString() const override;

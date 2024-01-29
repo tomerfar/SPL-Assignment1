@@ -9,6 +9,7 @@ using std::vector;
 class Customer {
     public:
         Customer(int id, const string &name, int locationDistance, int maxOrders);
+        virtual ~Customer() = default;
         const string &getName() const;
         int getId() const;
         int getCustomerDistance() const;
@@ -33,6 +34,7 @@ class Customer {
 class SoldierCustomer: public Customer {
     public:
         SoldierCustomer(int id, const string &name, int locationDistance, int maxOrders);
+        ~SoldierCustomer() override = default;
         SoldierCustomer *clone() const override;
     
     private:
@@ -42,6 +44,7 @@ class SoldierCustomer: public Customer {
 class CivilianCustomer: public Customer {
     public:
         CivilianCustomer(int id, const string &name, int locationDistance, int maxOrders);
+        ~CivilianCustomer() override = default;
         CivilianCustomer *clone() const override;
     
     private:

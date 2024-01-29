@@ -7,6 +7,7 @@ using namespace std; //Solve the problem of the cout. Or we need to write the be
 //---BaseAction---------------------------------------------------------------------------------------
 //Add Constructor
 BaseAction::BaseAction() : errorMsg(""), status(ActionStatus::COMPLETED){} // check what to start status with
+
 ActionStatus BaseAction:: getStatus() const
 {
     return status;
@@ -171,8 +172,8 @@ AddOrder *AddOrder:: clone() const
 //---AddCustomer----------------------------------------------------------------------------------------
 //Constructor
 AddCustomer:: AddCustomer(string customerName, string customerType, int distance, int maxOrders): BaseAction(),
-  customerName(customerName), distance(distance), maxOrders(maxOrders), customerType((customerType == "Soldier") ? CustomerType::Soldier : CustomerType::Civilian)
-   {};
+  customerName(customerName), customerType((customerType == "Soldier") ? CustomerType::Soldier : CustomerType::Civilian),  
+  distance(distance), maxOrders(maxOrders) {};
    // the ? operator checks to see if the customer type is Soldier or Civilian and gives the right type according to the string.
 
 //Methods
@@ -201,6 +202,8 @@ string AddCustomer:: customerTypeToString(CustomerType type) const //Convert the
         return "Soldier";
     case CustomerType::Civilian:
         return "Civilian";
+    default: 
+        return "Undefined";
     }
 }
 
@@ -254,7 +257,7 @@ string PrintOrderStatus:: toString() const
 //---PrintCustomerStatus-----------------------------------------------------------------------------------
 //Constructors
 PrintCustomerStatus::PrintCustomerStatus(int CustomerId):
-BaseAction(), customerId(customerId){};
+BaseAction(), customerId(CustomerId){};
 
 //Methods
 void PrintCustomerStatus:: act(WareHouse &wareHouse) 
@@ -334,7 +337,7 @@ void PrintActionsLog:: act(WareHouse &wareHouse)
     wareHouse.addAction(this);
     for(BaseAction* action : wareHouse.getActions())
     {
-        std::cout<< this->toString() << std::endl;
+        std::cout<< action->toString() << std::endl;
     }
     complete(); // This action never results in an error.
 }
@@ -442,8 +445,4 @@ string RestoreWareHouse:: toString() const
 {
     return "restoreWareHouse " + status_to_str();
 }
-
-
-
-
 //---RestoreWareHouse---------------------------------------------------------------------------------------

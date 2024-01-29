@@ -1,4 +1,5 @@
 #include "WareHouse.h"
+#include "Action.h"
 
 void WareHouse::parse(const std::string& configFilePath) {
     std::ifstream configFile(configFilePath);
