@@ -230,7 +230,7 @@ AddCustomer *AddCustomer:: clone() const
  void PrintOrderStatus:: act(WareHouse& wareHouse) 
  {
     wareHouse.addAction(this);
-    if (orderId > wareHouse.getOrderCounter()) 
+    if (orderId > wareHouse.getOrderCounter())  //NEED TO FIX IT!!
     {
         error("Order doesn't exist.");  
         getErrorMsg();
@@ -279,9 +279,8 @@ void PrintCustomerStatus:: act(WareHouse &wareHouse)
             std::cout << "OrderStatus: " << ord.statusToString(ord.getStatus()) << std::endl;
            }
            std::cout << "numOrdersLeft: " << to_string(cus.getMaxOrders() - cus.getNumOrders()) << std::endl;
+           complete();
         }
-       
-    complete();
 }
 
 
@@ -432,11 +431,13 @@ RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
     {
         error("backup doesn't exist");
         getErrorMsg();
+        wareHouse.addAction(this);
     } else {
         wareHouse.addAction(this);
         wareHouse = *backup;
         complete();
     }
+    
  }
 
 RestoreWareHouse *RestoreWareHouse:: clone() const
