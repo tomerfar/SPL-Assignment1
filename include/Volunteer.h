@@ -40,7 +40,7 @@ class CollectorVolunteer: public Volunteer {
 
     public:
         CollectorVolunteer(int id, const string &name, int coolDown);
-        ~CollectorVolunteer() = default;
+        ~CollectorVolunteer() override = default;
         CollectorVolunteer *clone() const override;
         void step() override;
         int getCoolDown() const;
@@ -60,7 +60,7 @@ class LimitedCollectorVolunteer: public CollectorVolunteer {
 
     public:
         LimitedCollectorVolunteer(int id, const string &name, int coolDown ,int maxOrders);
-        ~LimitedCollectorVolunteer() = default;
+        ~LimitedCollectorVolunteer() override = default;
         LimitedCollectorVolunteer *clone() const override;
         bool hasOrdersLeft() const override;
         bool canTakeOrder(const Order &order) const override;
@@ -79,7 +79,7 @@ class DriverVolunteer: public Volunteer {
 
     public:
         DriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep);
-        ~DriverVolunteer() = default;
+        ~DriverVolunteer() override = default;
         DriverVolunteer *clone() const override;
 
         int getDistanceLeft() const;
@@ -102,7 +102,7 @@ class LimitedDriverVolunteer: public DriverVolunteer {
 
     public:
         LimitedDriverVolunteer(int id, const string &name, int maxDistance, int distancePerStep,int maxOrders);
-        ~LimitedDriverVolunteer() = default;
+        ~LimitedDriverVolunteer() override = default;
         LimitedDriverVolunteer *clone() const override;
         int getMaxOrders() const;
         int getNumOrdersLeft() const;
