@@ -103,6 +103,7 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
         this->orderCounter = other.orderCounter;
         this->customerCounter = other.customerCounter;
         this->volunteerCounter = other.volunteerCounter;
+        //Perform a deep copy of orders, customers, volunteers, and actions
 
         // Perform a deep copy of orders, customers, volunteers, and actions
         for (const Order *otherOrder : other.pendingOrders)

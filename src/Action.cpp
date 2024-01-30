@@ -184,12 +184,12 @@ void AddCustomer::act(WareHouse &wareHouse)
     int customerId = wareHouse.getCustomerCounter();
     if (this->customerType == CustomerType::Soldier)
     {
-        SoldierCustomer *newCustomer = new SoldierCustomer(customerId, customerName, distance, maxOrders);
+        SoldierCustomer* newCustomer = new SoldierCustomer(customerId, customerName, distance, maxOrders);
         wareHouse.addCustomer(newCustomer);
     }
     else
     {
-        CivilianCustomer *newCustomer = new CivilianCustomer(customerId, customerName, distance, maxOrders);
+        CivilianCustomer* newCustomer = new CivilianCustomer(customerId, customerName, distance, maxOrders);
         wareHouse.addCustomer(newCustomer);
     }
     complete();
@@ -395,6 +395,7 @@ BackupWareHouse *BackupWareHouse::clone() const
 
 string BackupWareHouse::toString() const
 {
+    return "backup COMPLETED";
     return "backup COMPLETED";
 }
 //---BackupWareHouse----------------------------------------------------------------------------------------
