@@ -71,7 +71,7 @@ class LimitedCollectorVolunteer: public CollectorVolunteer {
         int getMaxOrders() const;
         int getNumOrdersLeft() const;
         string toString() const override;
-        //bool isCollector() override;
+       
         
     
     private:
@@ -115,7 +115,7 @@ class LimitedDriverVolunteer: public DriverVolunteer {
         bool canTakeOrder(const Order &order) const override; // Signal if the volunteer is not busy, the order is within the maxDistance.
         void acceptOrder(const Order &order) override; // Assign distanceLeft to order's distance and decrease ordersLeft
         string toString() const override;
-       // bool isCollector() override;
+      
 
     private:
         const int maxOrders; // The number of orders the volunteer can process in the whole simulation

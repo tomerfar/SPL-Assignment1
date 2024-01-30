@@ -18,19 +18,19 @@ enum class CustomerType{
 
 class BaseAction{
     public:
-        BaseAction(); // check if we need to implement default constructor 
+        BaseAction();
         virtual ~BaseAction() = default;
         ActionStatus getStatus() const;
         virtual void act(WareHouse& wareHouse)=0;
         virtual string toString() const=0;
         virtual BaseAction* clone() const=0;
-        string status_to_str() const;                 // yuval added
+        string status_to_str() const;                 
 
     protected:
         void complete();
         void error(string errorMsg);
         string getErrorMsg() const;
-        void printErrorMsg() const; // Added myself, prints the error msg
+        void printErrorMsg() const; 
 
     private:
         string errorMsg;
@@ -60,7 +60,7 @@ class AddOrder : public BaseAction {
         AddOrder *clone() const override;
     private:
         const int customerId;
-        int orderId; // yuval added for toString
+        int orderId; 
 };
 
 
@@ -71,7 +71,7 @@ class AddCustomer : public BaseAction {
         void act(WareHouse &wareHouse) override;
         AddCustomer *clone() const override;
         string toString() const override;
-        string customerTypeToString(CustomerType type) const; // Added myself
+        string customerTypeToString(CustomerType type) const; 
     private:
         const string customerName;
         const CustomerType customerType;

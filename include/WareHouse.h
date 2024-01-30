@@ -25,7 +25,7 @@ class WareHouse {
         WareHouse(WareHouse&& other) noexcept; //Move Constructor
         WareHouse& operator=(WareHouse&& other) noexcept; // Move Assignment Operator
 
-        void clearData(); // Added myself, clears the data of an object
+        void clearData(); //clears the data of an object
         void start();
         void addOrder(Order* order);
         void addAction(BaseAction* action);
