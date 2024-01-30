@@ -28,7 +28,8 @@ int Customer::  getNumOrders() const{
   return ordersId.size();
 }
 bool Customer:: canMakeOrder() const{
-  if(maxOrders - ordersId.size() == 0){
+  if(maxOrders - ordersId.size() == 0)
+  {
     return false;
   }
   return true;

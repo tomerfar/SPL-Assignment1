@@ -113,7 +113,7 @@ SimulateStep::SimulateStep(int numOfSteps) : numOfSteps(numOfSteps) {};
 
 string SimulateStep:: toString() const
 {
-    return "simulateStep " + to_string(numOfSteps) + " " + status_to_str();
+    return "step " + to_string(numOfSteps) + " " + status_to_str();
 }
 
 SimulateStep *SimulateStep:: clone() const
@@ -122,7 +122,7 @@ SimulateStep *SimulateStep:: clone() const
 }
 
  
-//---SimulateStep---------------------------------------------------------------------------------------
+
 
  
 //---AddOrder-------------------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ AddOrder *AddOrder:: clone() const
     return new AddOrder(*this);
 }
 
-//---AddOrder-------------------------------------------------------------------------------------------
+
 
 
 //---AddCustomer----------------------------------------------------------------------------------------
@@ -183,13 +183,13 @@ void AddCustomer::act(WareHouse &wareHouse) // add error
     int customerId = wareHouse.getCustomerCounter();
     if(this->customerType == CustomerType::Soldier)
     {
-        SoldierCustomer newCustomer = SoldierCustomer(customerId, customerName, distance, maxOrders);
-        wareHouse.addCustomer(&newCustomer);
+        SoldierCustomer* newCustomer = new SoldierCustomer(customerId, customerName, distance, maxOrders);
+        wareHouse.addCustomer(newCustomer);
     }
     else
     {
-        CivilianCustomer newCustomer = CivilianCustomer(customerId, customerName, distance, maxOrders);
-        wareHouse.addCustomer(&newCustomer);
+        CivilianCustomer* newCustomer = new CivilianCustomer(customerId, customerName, distance, maxOrders);
+        wareHouse.addCustomer(newCustomer);
     }
     complete();
 }
@@ -210,7 +210,7 @@ string AddCustomer:: customerTypeToString(CustomerType type) const //Convert the
 string AddCustomer:: toString() const 
 {
     return "customer " + customerName + " " + customerTypeToString(customerType) + " "
-     + to_string(distance) + " " + to_string(maxOrders);
+     + to_string(distance) + " " + to_string(maxOrders) + "COMPLETED";
 }
 
 AddCustomer *AddCustomer:: clone() const
@@ -218,7 +218,7 @@ AddCustomer *AddCustomer:: clone() const
     return new AddCustomer(*this);
 }
 
-//---AddCustomer-------------------------------------------------------------------------------------------
+
 
 
 //---PrintStatusOrder--------------------------------------------------------------------------------------
@@ -230,9 +230,9 @@ AddCustomer *AddCustomer:: clone() const
  void PrintOrderStatus:: act(WareHouse& wareHouse) 
  {
     wareHouse.addAction(this);
-    if (orderId > wareHouse.getOrderCounter())  //NEED TO FIX IT!!
+    if (orderId >= wareHouse.getOrderCounter())  
     {
-        error("Order doesn't exist.");  
+        error(" Order doesn't exist.");  
         getErrorMsg();
     } else {
         Order &ord = wareHouse.getOrder(orderId); 
@@ -252,7 +252,6 @@ string PrintOrderStatus:: toString() const
 }
 
 
-//---PrintStatusOrder--------------------------------------------------------------------------------------
 
 //---PrintCustomerStatus-----------------------------------------------------------------------------------
 //Constructors
@@ -263,9 +262,9 @@ BaseAction(), customerId(CustomerId){};
 void PrintCustomerStatus:: act(WareHouse &wareHouse) 
 {
     wareHouse.addAction(this);
-    if (customerId > wareHouse.getCustomerCounter())
+    if (customerId >= wareHouse.getCustomerCounter())
     {
-        error("Customer doesn't exist.");
+        error(" Customer doesn't exist.");
         getErrorMsg();  
     }
     else
@@ -294,7 +293,6 @@ string PrintCustomerStatus:: toString() const // check if correct
     return "customerStatus " + to_string(customerId) + " " + status_to_str();
 }
 
-//---PrintCustomerStatus-----------------------------------------------------------------------------------
 
 //---PrintVolunteerStatus----------------------------------------------------------------------------------
 //Constructors
@@ -305,9 +303,9 @@ string PrintCustomerStatus:: toString() const // check if correct
 void PrintVolunteerStatus:: act(WareHouse &wareHouse)
 {
     wareHouse.addAction(this);
-    if(volunteerId > wareHouse.getVolunteerCounter())
+    if(volunteerId >= wareHouse.getVolunteerCounter() || wareHouse.getVolunteer(volunteerId).getId() == -1)
     {
-        error("Volunteer doesn't exist.");
+        error(" Volunteer doesn't exist.");
         getErrorMsg(); 
     }
     else
@@ -327,8 +325,8 @@ string PrintVolunteerStatus:: toString() const
 {
     return "volunteerStatus " + to_string(volunteerId) + " " + status_to_str();
 }
-   
-//---PrintVolunteerStatus-----------------------------------------------------------------------------------
+
+
 
 //---PrintActionsLog----------------------------------------------------------------------------------------
 //Constructor
@@ -357,12 +355,10 @@ string PrintActionsLog:: toString() const
 
 
 
-//---PrintActionsLog----------------------------------------------------------------------------------------
+
 
 
 //---Close--------------------------------------------------------------------------------------------------
-
-
 
 //Constructor
 Close::Close(): BaseAction(){}
@@ -415,7 +411,7 @@ BackupWareHouse *BackupWareHouse:: clone() const
 
 string BackupWareHouse:: toString() const
 {
-    return "backupWareHouse COMPLETED";
+    return "backup COMPLETED";
 }
 //---BackupWareHouse----------------------------------------------------------------------------------------
 
@@ -429,15 +425,13 @@ RestoreWareHouse:: RestoreWareHouse(): BaseAction(){};
  {
     if(backup == nullptr)
     {
-        error("backup doesn't exist");
+        error(" Backup doesn't exist");
         getErrorMsg();
-        wareHouse.addAction(this);
     } else {
-        wareHouse.addAction(this);
         wareHouse = *backup;
         complete();
     }
-    
+    wareHouse.addAction(this);
  }
 
 RestoreWareHouse *RestoreWareHouse:: clone() const
@@ -447,6 +441,6 @@ RestoreWareHouse *RestoreWareHouse:: clone() const
 
 string RestoreWareHouse:: toString() const
 {
-    return "restoreWareHouse " + status_to_str();
+    return "restore " + status_to_str();
 }
 //---RestoreWareHouse---------------------------------------------------------------------------------------

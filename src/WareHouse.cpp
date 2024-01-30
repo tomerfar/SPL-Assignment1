@@ -69,42 +69,38 @@ void WareHouse:: clearData()
 
 //CopyConstructor
 WareHouse:: WareHouse(const WareHouse& other): isOpen(other.isOpen),
- actionsLog(other.actionsLog), volunteers(other.volunteers),
- pendingOrders(other.pendingOrders), inProcessOrders(other.inProcessOrders),
- completedOrders(other.completedOrders), customers(other.customers),
- customerCounter(other.customerCounter),
- volunteerCounter(other.volunteerCounter),
+ actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(), customers(),
+ customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter),
  orderCounter(other.orderCounter)
- {
-    for (const Order* otherOrder : other.pendingOrders)
-        { //Perform a deep copy of the pending orders
-            Order* newOrder = new Order(*otherOrder);
-            pendingOrders.push_back(newOrder);
-        }
-        for (const Order* otherOrder : other.inProcessOrders)
-        { //Perform a deep copy of the in proccess orders
-            Order* newOrder = new Order(*otherOrder);
-            inProcessOrders.push_back(newOrder);
-        }
-        for (const Order* otherOrder : other.completedOrders)
-        { //Perform a deep copy of the completed orders
-            Order* newOrder = new Order(*otherOrder);
-            completedOrders.push_back(newOrder);
-        }
-        for (const Customer* otherCustomer : other.customers)
-        { // Use the clone method to copy the customers
-            customers.push_back(otherCustomer->clone());
-        }
-        for (const Volunteer* otherVolunteer : other.volunteers)
-        { // Use the clone method to copy the volunteers
-            volunteers.push_back(otherVolunteer->clone());
-        }
-        for(const BaseAction* otherAction : other.actionsLog)
-        { // Use the clone method of each derived baseAction class to copy the actions
-            actionsLog.push_back(otherAction->clone());
-        }
+ { //Perform a deep copy of resources: orders, customers, volunteers, and actions
+    for (const Order* otherOrder : other.pendingOrders) 
+    { 
+        // Order* newOrder = new Order(otherOrder->clone());
+        pendingOrders.push_back(otherOrder->clone());
+    }
+    for (const Order* otherOrder : other.inProcessOrders)
+    { 
+        //Order* newOrder = new Order(otherOrder->clone());
+        inProcessOrders.push_back(otherOrder->clone());
+    }
+    for (const Order* otherOrder : other.completedOrders)
+    { 
+        // Order* newOrder = new Order(otherOrder->clone());
+        completedOrders.push_back(otherOrder->clone());
+    }
+    for (const Customer* otherCustomer : other.customers)
+    { 
+        customers.push_back(otherCustomer->clone());
+    }
+    for (const Volunteer* otherVolunteer : other.volunteers)
+    { 
+        volunteers.push_back(otherVolunteer->clone());
+    }
+    for(const BaseAction* otherAction : other.actionsLog)
+    { 
+        actionsLog.push_back(otherAction->clone());
+    }
  }
-//CopyConstructor
 
 //CopyAssignmentOperator
 WareHouse& WareHouse::operator=(const WareHouse& other)
@@ -116,57 +112,51 @@ WareHouse& WareHouse::operator=(const WareHouse& other)
         this->orderCounter = other.orderCounter;
         this->customerCounter = other.customerCounter;
         this->volunteerCounter = other.volunteerCounter;
+        //Perform a deep copy of orders, customers, volunteers, and actions
 
         for (const Order* otherOrder : other.pendingOrders)
-        { //Perform a deep copy of the pending orders
-            Order* newOrder = new Order(*otherOrder);
-            pendingOrders.push_back(newOrder);
+        { 
+            //Order* newOrder = new Order(otherOrder->clone());
+            pendingOrders.push_back(otherOrder->clone());
         }
         for (const Order* otherOrder : other.inProcessOrders)
-        { //Perform a deep copy of the in proccess orders
-            Order* newOrder = new Order(*otherOrder);
-            inProcessOrders.push_back(newOrder);
+        { 
+            //Order* newOrder = new Order(otherOrder->clone());
+            inProcessOrders.push_back(otherOrder->clone());
         }
         for (const Order* otherOrder : other.completedOrders)
-        { //Perform a deep copy of the completed orders
-            Order* newOrder = new Order(*otherOrder);
-            completedOrders.push_back(newOrder);
+        { 
+            //Order* newOrder = new Order(otherOrder->clone());
+            completedOrders.push_back(otherOrder->clone());
         }
         for (const Customer* otherCustomer : other.customers)
-        { // Use the clone method to copy the customers
+        { 
             customers.push_back(otherCustomer->clone());
         }
         for (const Volunteer* otherVolunteer : other.volunteers)
-        { // Use the clone method to copy the volunteers
+        { 
             volunteers.push_back(otherVolunteer->clone());
         }
         for(const BaseAction* otherAction : other.actionsLog)
-        { // Use the clone method of each derived baseAction class to copy the actions
+        { 
             actionsLog.push_back(otherAction->clone());
         }
     }
     return *this;
 }
-//CopyAssignmentOperator
 
 //Move Constructor
 WareHouse::WareHouse(WareHouse&& other) noexcept:
-isOpen(move(other.isOpen)), actionsLog(move(other.actionsLog)), volunteers(move(other.volunteers)),
+isOpen(other.isOpen),
+ actionsLog(move(other.actionsLog)), volunteers(move(other.volunteers)),
  pendingOrders(move(other.pendingOrders)), inProcessOrders(move(other.inProcessOrders)),
  completedOrders(move(other.completedOrders)), customers(move(other.customers)),
- customerCounter(other.customerCounter),
- volunteerCounter(other.volunteerCounter),
+ customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter),
  orderCounter(other.orderCounter)
 {
-    //check what to do with the counter fields, they arent pointers so we cant set them do be nullptr
-   other.pendingOrders.clear();
-   other.inProcessOrders.clear();
-   other.completedOrders.clear();
-   other.customers.clear();
-   other.volunteers.clear();
-   other.actionsLog.clear();
+   // reallocate to null so fields don't get deleted once leaving the scope 
+   
 };
-//Move Constructor
 
 //Move Assignment Operator
 WareHouse& WareHouse::operator=(WareHouse&& other) noexcept
@@ -181,13 +171,13 @@ WareHouse& WareHouse::operator=(WareHouse&& other) noexcept
     completedOrders = move(other.completedOrders);
     customers = move(other.customers);
     customerCounter = other.customerCounter;
+    isOpen = other.isOpen;
     volunteerCounter = other.volunteerCounter;
     orderCounter = other.orderCounter;
 
   }
   return *this;
 }
-//Move Assignment Operator
 
 void WareHouse:: start()
 {

@@ -32,6 +32,7 @@ class Order {
         const string collectorToString() const; // added myself , converts collector's id to string.
         const string driverToString() const; //added myself, converts driver's id to string.
         const string statusToString(OrderStatus status) const; // added myself, returns status order as a string.
+        Order* clone() const;
 
 
 

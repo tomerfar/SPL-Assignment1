@@ -99,6 +99,9 @@ Order::Order(int id, int customerId, int distance):
      + "Driver: " + this->driverToString();
   }
 
+Order *Order::clone() const {
+  return new Order(*this);
+}
 
 
 
