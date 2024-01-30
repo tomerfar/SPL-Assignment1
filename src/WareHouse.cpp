@@ -13,7 +13,6 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
     parse(configFilePath);
     cout << "Warehouse is open!" << endl;
-    start();
 }
 
 // Destructor
