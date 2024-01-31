@@ -13,7 +13,7 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
     parse(configFilePath);
     cout << "Warehouse is open!" << endl;
-    start();
+    
 }
 
 // Destructor
@@ -103,6 +103,7 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
         this->orderCounter = other.orderCounter;
         this->customerCounter = other.customerCounter;
         this->volunteerCounter = other.volunteerCounter;
+        this->isOpen = other.isOpen;
         //Perform a deep copy of orders, customers, volunteers, and actions
 
         // Perform a deep copy of orders, customers, volunteers, and actions
