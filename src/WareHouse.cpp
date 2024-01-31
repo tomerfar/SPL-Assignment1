@@ -11,6 +11,9 @@ using namespace std;
 WareHouse::WareHouse(const string &configFilePath) : isOpen(false), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(),
 customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
+    defaultVol = new CollectorVolunteer(-1, "default", -1);
+    defaultOrd = new Order(-1, -1, -1);
+    defaultCus = new CivilianCustomer(-1, "default", -1, -1);
     parse(configFilePath);
     cout << "Warehouse is open!" << endl;
 }
@@ -20,6 +23,9 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 WareHouse::~WareHouse()
 {
     clearData();
+    delete defaultVol;
+    delete defaultOrd;
+    delete defaultCus;
 }
 
 // clearData 
@@ -66,6 +72,11 @@ WareHouse::WareHouse(const WareHouse &other) :
   customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter),
   orderCounter(other.orderCounter)
 { // Perform a deep copy of resources: orders, customers, volunteers, and actions
+
+    defaultVol = other.defaultVol->clone();
+    defaultOrd = other.defaultOrd->clone();
+    defaultCus = other.defaultCus->clone();
+
     for (const Order *otherOrder : other.pendingOrders)
     {
         pendingOrders.push_back(otherOrder->clone());
@@ -97,12 +108,12 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
 {
     if (this != &other)
     {
-        clearData(); 
+        clearData(); // note that clearData does not erase defaults; they remain the same 
         // Copying fields
-        this->orderCounter = other.orderCounter;
-        this->customerCounter = other.customerCounter;
-        this->volunteerCounter = other.volunteerCounter;
-        //Perform a deep copy of orders, customers, volunteers, and actions
+        orderCounter = other.orderCounter;
+        customerCounter = other.customerCounter;
+        volunteerCounter = other.volunteerCounter;
+        isOpen = other.isOpen;
 
         // Perform a deep copy of orders, customers, volunteers, and actions
         for (const Order *otherOrder : other.pendingOrders)
@@ -133,11 +144,12 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
     return *this;
 }
 
-// Move Constructor - reallocate to null so fields don't get deleted once leaving the scope
+// Move Constructor 
 WareHouse::WareHouse(WareHouse &&other) noexcept : isOpen(other.isOpen), actionsLog(move(other.actionsLog)), 
 volunteers(move(other.volunteers)), pendingOrders(move(other.pendingOrders)), inProcessOrders(move(other.inProcessOrders)),
 completedOrders(move(other.completedOrders)), customers(move(other.customers)), customerCounter(other.customerCounter), 
-volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter) {};
+volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter), defaultVol(move(other.defaultVol)), 
+defaultOrd(move(other.defaultOrd)), defaultCus(move(other.defaultCus)) {};
                                                 
 
 // Move Assignment Operator
@@ -145,7 +157,7 @@ WareHouse &WareHouse::operator=(WareHouse &&other) noexcept
 {
     if (this != &other)
     {
-        clearData();
+        clearData(); // defaults aren't deleted
         actionsLog = move(other.actionsLog);
         volunteers = move(other.volunteers);
         pendingOrders = move(other.pendingOrders);
@@ -171,11 +183,6 @@ void WareHouse::start()
         parseLine(input);
     }
 }
-
-//Set of default Objects for Orders, Customers, Volunteers
-CollectorVolunteer *defaultVol = new CollectorVolunteer(-1, "default", -1);
-Order *defaultOrd = new Order(-1, -1, -1);
-CivilianCustomer *defaultCus = new CivilianCustomer(-1, "default", -1, -1);
 
 void WareHouse::addOrder(Order *order)
 {
