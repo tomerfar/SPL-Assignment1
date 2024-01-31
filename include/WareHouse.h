@@ -65,5 +65,8 @@ class WareHouse {
         int customerCounter; //For assigning unique customer IDs
         int volunteerCounter; //For assigning unique volunteer IDs
         int orderCounter; //For assigning unique order IDs
+        CollectorVolunteer *defaultVol;   
+        Order *defaultOrd;
+        CivilianCustomer *defaultCus;
 
 };
