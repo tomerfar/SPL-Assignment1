@@ -14,6 +14,7 @@ defaultOrd(new Order(-1, -1, -1)), defaultCus(new CivilianCustomer(-1, "default"
 {
     parse(configFilePath);
     cout << "Warehouse is open!" << endl;
+    
 }
 
 // Destructor
@@ -142,8 +143,7 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
 WareHouse::WareHouse(WareHouse &&other) noexcept : isOpen(other.isOpen), actionsLog(move(other.actionsLog)), 
 volunteers(move(other.volunteers)), pendingOrders(move(other.pendingOrders)), inProcessOrders(move(other.inProcessOrders)),
 completedOrders(move(other.completedOrders)), customers(move(other.customers)), customerCounter(other.customerCounter), 
-volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter), defaultVol(move(other.defaultVol)), 
-defaultOrd(move(other.defaultOrd)), defaultCus(move(other.defaultCus)) {};
+volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter){};
                                                 
 
 // Move Assignment Operator
@@ -200,6 +200,10 @@ void WareHouse::addAction(BaseAction *action)
 {
     actionsLog.push_back(action); 
 }
+
+ CollectorVolunteer* defaultVol = new CollectorVolunteer(-1, "default", -1);
+ Order* defaultOrd = new Order(-1, -1, -1);
+ CivilianCustomer* defaultCus = new CivilianCustomer(-1, "default", -1, -1);
 
 Customer &WareHouse::getCustomer(int customerId) const
 {
