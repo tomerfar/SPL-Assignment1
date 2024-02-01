@@ -11,9 +11,7 @@ using namespace std;
 WareHouse::WareHouse(const string &configFilePath) : isOpen(false), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(),
 customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 {
-    defaultVol = new CollectorVolunteer(-1, "default", -1);
-    defaultOrd = new Order(-1, -1, -1);
-    defaultCus = new CivilianCustomer(-1, "default", -1, -1);
+   
     parse(configFilePath);
     cout << "Warehouse is open!" << endl;
     
@@ -24,9 +22,6 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 WareHouse::~WareHouse()
 {
     clearData();
-    delete defaultVol;
-    delete defaultOrd;
-    delete defaultCus;
 }
 
 // clearData 
@@ -74,9 +69,6 @@ WareHouse::WareHouse(const WareHouse &other) :
   orderCounter(other.orderCounter)
 { // Perform a deep copy of resources: orders, customers, volunteers, and actions
 
-    defaultVol = other.defaultVol->clone();
-    defaultOrd = other.defaultOrd->clone();
-    defaultCus = other.defaultCus->clone();
 
     for (const Order *otherOrder : other.pendingOrders)
     {
@@ -149,8 +141,7 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
 WareHouse::WareHouse(WareHouse &&other) noexcept : isOpen(other.isOpen), actionsLog(move(other.actionsLog)), 
 volunteers(move(other.volunteers)), pendingOrders(move(other.pendingOrders)), inProcessOrders(move(other.inProcessOrders)),
 completedOrders(move(other.completedOrders)), customers(move(other.customers)), customerCounter(other.customerCounter), 
-volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter), defaultVol(move(other.defaultVol)), 
-defaultOrd(move(other.defaultOrd)), defaultCus(move(other.defaultCus)) {};
+volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter){};
                                                 
 
 // Move Assignment Operator
@@ -207,6 +198,10 @@ void WareHouse::addAction(BaseAction *action)
 {
     actionsLog.push_back(action); 
 }
+
+ CollectorVolunteer* defaultVol = new CollectorVolunteer(-1, "default", -1);
+ Order* defaultOrd = new Order(-1, -1, -1);
+ CivilianCustomer* defaultCus = new CivilianCustomer(-1, "default", -1, -1);
 
 Customer &WareHouse::getCustomer(int customerId) const
 {
