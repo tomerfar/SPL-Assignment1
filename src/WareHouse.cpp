@@ -21,15 +21,18 @@ defaultOrd(new Order(-1, -1, -1)), defaultCus(new CivilianCustomer(-1, "default"
 
 WareHouse::~WareHouse()
 {
-    delete defaultVol;
-    delete defaultOrd;
-    delete defaultCus;
     clearData();
 }
 
 // clearData 
 void WareHouse::clearData()
 { // erases pointed to memory in the heap
+    delete defaultVol;
+    delete defaultOrd;
+    delete defaultCus;
+    defaultVol = nullptr;
+    defaultOrd = nullptr;
+    defaultCus = nullptr;
     for (const Order *ord : pendingOrders)
     { 
         delete ord;
@@ -109,6 +112,9 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
         customerCounter = other.customerCounter;
         volunteerCounter = other.volunteerCounter;
         isOpen = other.isOpen;
+        defaultVol = other.defaultVol->clone();
+        defaultOrd = other.defaultOrd->clone();
+        defaultCus = other.defaultCus->clone();
 
         // Perform a deep copy of orders, customers, volunteers, and actions
         for (const Order *otherOrder : other.pendingOrders)
@@ -143,7 +149,8 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
 WareHouse::WareHouse(WareHouse &&other) noexcept : isOpen(other.isOpen), actionsLog(move(other.actionsLog)), 
 volunteers(move(other.volunteers)), pendingOrders(move(other.pendingOrders)), inProcessOrders(move(other.inProcessOrders)),
 completedOrders(move(other.completedOrders)), customers(move(other.customers)), customerCounter(other.customerCounter), 
-volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter){};
+volunteerCounter(other.volunteerCounter), orderCounter(other.orderCounter),
+defaultVol(move(other.defaultVol)), defaultOrd(move(other.defaultOrd)), defaultCus(move(other.defaultCus)){};
                                                 
 
 // Move Assignment Operator
@@ -162,6 +169,9 @@ WareHouse &WareHouse::operator=(WareHouse &&other) noexcept
         isOpen = other.isOpen;
         volunteerCounter = other.volunteerCounter;
         orderCounter = other.orderCounter;
+        defaultVol = move(other.defaultVol);
+        defaultOrd = move(other.defaultOrd);
+        defaultCus = move(other.defaultCus);
     }
     return *this;
 }
@@ -201,9 +211,6 @@ void WareHouse::addAction(BaseAction *action)
     actionsLog.push_back(action); 
 }
 
- CollectorVolunteer* defaultVol = new CollectorVolunteer(-1, "default", -1);
- Order* defaultOrd = new Order(-1, -1, -1);
- CivilianCustomer* defaultCus = new CivilianCustomer(-1, "default", -1, -1);
 
 Customer &WareHouse::getCustomer(int customerId) const
 {
