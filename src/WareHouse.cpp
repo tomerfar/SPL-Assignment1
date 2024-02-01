@@ -9,11 +9,9 @@ using namespace std;
 
 // Constructor
 WareHouse::WareHouse(const string &configFilePath) : isOpen(false), actionsLog(), volunteers(), pendingOrders(), inProcessOrders(), completedOrders(),
-customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
+customers(), customerCounter(0), volunteerCounter(0), orderCounter(0), defaultVol(new CollectorVolunteer(-1, "default", -1)),
+defaultOrd(new Order(-1, -1, -1)), defaultCus(new CivilianCustomer(-1, "default",-1 , -1)) 
 {
-    defaultVol = new CollectorVolunteer(-1, "default", -1);
-    defaultOrd = new Order(-1, -1, -1);
-    defaultCus = new CivilianCustomer(-1, "default", -1, -1);
     parse(configFilePath);
     cout << "Warehouse is open!" << endl;
 }
@@ -22,10 +20,10 @@ customers(), customerCounter(0), volunteerCounter(0), orderCounter(0)
 
 WareHouse::~WareHouse()
 {
-    clearData();
     delete defaultVol;
     delete defaultOrd;
     delete defaultCus;
+    clearData();
 }
 
 // clearData 
@@ -70,12 +68,8 @@ WareHouse::WareHouse(const WareHouse &other) :
   isOpen(other.isOpen),actionsLog(), volunteers(), pendingOrders(),
   inProcessOrders(), completedOrders(), customers(),
   customerCounter(other.customerCounter), volunteerCounter(other.volunteerCounter),
-  orderCounter(other.orderCounter)
+  orderCounter(other.orderCounter), defaultVol(other.defaultVol->clone()), defaultOrd(other.defaultOrd->clone()), defaultCus(other.defaultCus->clone())
 { // Perform a deep copy of resources: orders, customers, volunteers, and actions
-
-    defaultVol = other.defaultVol->clone();
-    defaultOrd = other.defaultOrd->clone();
-    defaultCus = other.defaultCus->clone();
 
     for (const Order *otherOrder : other.pendingOrders)
     {
