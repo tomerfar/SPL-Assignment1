@@ -106,7 +106,7 @@ WareHouse &WareHouse::operator=(const WareHouse &other)
 {
     if (this != &other)
     {
-        clearData(); // note that clearData does not erase defaults; they remain the same 
+        clearData(); 
         // Copying fields
         orderCounter = other.orderCounter;
         customerCounter = other.customerCounter;
@@ -158,7 +158,7 @@ WareHouse &WareHouse::operator=(WareHouse &&other) noexcept
 {
     if (this != &other)
     {
-        clearData(); // defaults aren't deleted
+        clearData();
         actionsLog = move(other.actionsLog);
         volunteers = move(other.volunteers);
         pendingOrders = move(other.pendingOrders);
@@ -368,6 +368,7 @@ void WareHouse::removeVolunteer(Volunteer *vol) // delete volunteer when reaches
     auto it = std::find(volunteers.begin(), volunteers.end(), vol);
     if (it != volunteers.end())
     {
+        delete *it;
         volunteers.erase(it);
     }
 }

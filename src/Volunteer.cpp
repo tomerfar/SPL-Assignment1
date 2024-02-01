@@ -190,6 +190,7 @@ int DriverVolunteer::getDistancePerStep() const
 bool DriverVolunteer::decreaseDistanceLeft() // Decrease distanceLeft by distancePerStep,return true if distanceLeft<=0,false otherwise
 {
     distanceLeft = distanceLeft - distancePerStep;
+   
     return distanceLeft <= 0;
 }
 
