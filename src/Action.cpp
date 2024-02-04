@@ -117,7 +117,7 @@ void SimulateStep::act(WareHouse &wareHouse)
 
 string SimulateStep::toString() const
 {
-    return "step " + to_string(numOfSteps) + " " + status_to_str();
+    return "simulateStep " + to_string(numOfSteps) + " " + status_to_str();
 }
 
 SimulateStep *SimulateStep::clone() const
